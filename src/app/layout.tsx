@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Allura, Manrope, Outfit } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "@/components/layout/navbar";
 import SmoothScroll from "@/components/layout/SmoothScroll";
 
 const manrope = Manrope({
@@ -39,10 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${outfit.variable} ${ethnocentric.variable} ${allura.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg-base text-text-primary">
-        <SmoothScroll>
-          <Navbar />
-          {children}
-        </SmoothScroll>
+        <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   );

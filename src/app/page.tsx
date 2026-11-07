@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Navbar from "@/components/layout/navbar";
 import { Hero } from "@/components/sections/Hero";
 import { Preloader } from "@/components/ui/Preloader";
 
@@ -16,6 +17,8 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-bg-base text-(--color-text-primary)">
+      {/* The landing navbar belongs to this page only, not to the root layout. */}
+      <Navbar />
       {!isPreloaderDone && <Preloader onComplete={() => setIsPreloaderDone(true)} />}
       <div className="relative z-20 bg-bg-base">
         <Hero startAnimation={isPreloaderDone} />
