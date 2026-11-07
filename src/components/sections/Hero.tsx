@@ -4,6 +4,7 @@ import React, { useEffect, useRef } from "react";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import Image from "next/image";
 import gsap from "gsap";
+import { Button } from "@/components/ui/buttonAnimate";
 
 interface HeroProps {
   startAnimation?: boolean;
@@ -54,7 +55,7 @@ export const Hero = ({ startAnimation = true }: HeroProps) => {
   }, [startAnimation]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex flex-col justify-center pt-32 pb-0 overflow-hidden bg-bg-base">
+    <section id="home" ref={containerRef} className="relative z-20 min-h-screen flex flex-col justify-center pt-32 pb-0 overflow-hidden bg-bg-base">
       
       {/* Ambient Glows */}
       <div className="ambient-glow absolute top-[20%] left-[20%] w-[40vw] h-[40vw] rounded-full bg-(--glow-pink) blur-[80px] -z-10 opacity-30 mix-blend-screen pointer-events-none"></div>
@@ -64,10 +65,10 @@ export const Hero = ({ startAnimation = true }: HeroProps) => {
       <div className="w-full px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-6 mt-12 md:mt-0 hero-sub opacity-0">
         <div className="md:col-start-8 md:col-span-4 flex flex-col gap-2">
           <p className="text-(--color-text-muted) text-xs font-semibold tracking-widest uppercase">
-            Platform Tiket Konser
+            Global Concert Ticketing
           </p>
           <p className="text-(--color-text-primary) text-sm md:text-base max-w-sm uppercase leading-relaxed font-medium">
-            Dari stadium show artis global sampai gigs domestik di venue lokal. Temukan experience yang tak terlupakan.
+            From sold-out world stadium tours to intimate local gigs. Experience every live moment under the lights.
           </p>
         </div>
       </div>
@@ -76,26 +77,34 @@ export const Hero = ({ startAnimation = true }: HeroProps) => {
       <div className="w-full px-6 md:px-12 flex flex-col justify-center mt-16 md:mt-24 pb-20">
         <h1 className="font-heading leading-[0.9] tracking-tight flex flex-col">
           <div className="hero-text text-[16vw] md:text-[12vw] font-bold text-(--color-text-primary) opacity-0 w-fit">
-            Saksikan
+            Witness
           </div>
           <div className="flex flex-col md:flex-row md:items-center md:gap-8">
             <div className="hero-text text-[14vw] md:text-[10vw] font-light text-(--color-text-muted) italic ml-[8vw] md:ml-[15vw] opacity-0 w-fit">
-              Artis
+              Global
             </div>
             <div className="hero-text text-[14vw] md:text-[12vw] font-bold text-transparent bg-clip-text bg-linear-to-r from-(--color-accent-pink) to-(--color-accent-lime) ml-[12vw] md:ml-0 opacity-0 w-fit pb-2">
-              Mendunia
+              Stages
             </div>
           </div>
         </h1>
         
         {/* Buttons from design.md */}
         <div className="hero-text flex flex-row gap-2 md:gap-4 mt-8 md:mt-16 ml-[5vw] md:ml-[25vw] mr-[5vw] md:mr-0 opacity-0">
-          <button className="px-4 py-3 md:px-8 md:py-4 rounded-full bg-(--color-accent-lime) text-bg-base font-bold uppercase tracking-wide text-[10px] md:text-sm hover:scale-105 transition-transform flex-1 sm:flex-none text-center">
-            Cari Konser
-          </button>
-          <button className="px-4 py-3 md:px-8 md:py-4 rounded-full border border-(--color-border) text-(--color-text-primary) font-bold uppercase tracking-wide text-[10px] md:text-sm hover:bg-white/5 transition-colors flex-1 sm:flex-none text-center">
-            Lihat Line-up
-          </button>
+          <Button
+            variant="default"
+            size="lg"
+            className="flex-1 sm:flex-none"
+          >
+            Find Tickets
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="flex-1 sm:flex-none"
+          >
+            View Line-up
+          </Button>
         </div>
       </div>
 
