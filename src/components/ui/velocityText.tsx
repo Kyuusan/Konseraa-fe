@@ -10,7 +10,7 @@ import {
 } from "framer-motion";
 
 // Wrap function (replacement for @motionone/utils)
-const wrap = (min, max, v) => {
+const wrap = (min: number, max: number, v: number) => {
   const rangeSize = max - min;
   return ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;
 };

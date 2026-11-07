@@ -454,12 +454,6 @@ export default function KilnWordmarkFooter({
     last: 0,
   })
 
-  // New word: every letter starts at the base weight.
-  if (anim.current.k.length !== lay.letters.length) {
-    anim.current.k = lay.letters.map(() => base)
-    anim.current.kT = lay.letters.map(() => base)
-  }
-
   const paint = React.useCallback(() => {
     const a = anim.current
     const { w, h } = a.size
@@ -540,26 +534,9 @@ export default function KilnWordmarkFooter({
     }
     window.addEventListener("scroll", checkScrollReveal, { passive: true })
     checkScrollReveal()
-    let io: IntersectionObserver | null = null
-    if (false && typeof IntersectionObserver === "function") {
-      io = new IntersectionObserver(
-        (entries) => {
-          if (entries.some((e) => e.isIntersecting)) {
-            setShown(true)
-            ro.disconnect()
-      io?.disconnect()
-      window.removeEventListener("scroll", checkScrollReveal)
-          }
-        },
-        { threshold: 0.15 },
-      )
-      io.observe(el)
-    }
 
     return () => {
       ro.disconnect()
-      ro.disconnect()
-      io?.disconnect()
       window.removeEventListener("scroll", checkScrollReveal)
       mq?.removeEventListener("change", onMq)
       cancelAnimationFrame(a.raf)
@@ -567,10 +544,17 @@ export default function KilnWordmarkFooter({
     }
   }, [])
 
-  // A resize re-renders the tile at the new size; repaint the loop-owned attributes over it.
+  // The loop owns the tile and glyph geometry, so it is painted here instead of
+  // rendered: on mount, on resize, and when the word changes (every letter of a
+  // new word starts at the base weight).
   React.useLayoutEffect(() => {
+    const a = anim.current
+    if (a.k.length !== lay.letters.length) {
+      a.k = lay.letters.map(() => base)
+      a.kT = lay.letters.map(() => base)
+    }
     paint()
-  }, [size, paint])
+  }, [size, paint, lay, base])
 
   // The weight prop moves every resting letter.
   React.useEffect(() => {
@@ -656,7 +640,6 @@ export default function KilnWordmarkFooter({
     scroller?.scrollTo({ top: 0, behavior: anim.current.reduced ? "auto" : "smooth" })
   }
 
-  const t = anim.current.cur
   const vars = {
     "--kwf-surface": surface,
     "--kwf-deep": deep,
@@ -665,8 +648,8 @@ export default function KilnWordmarkFooter({
     "--kwf-sans": fontSans,
   } as React.CSSProperties
 
-  let delay = 0
-  const fade = () => ({ "--kwf-d": (delay += 45) + "ms" }) as React.CSSProperties
+  // Stagger order of the fade-in blocks, top to bottom.
+  const fade = (order: number) => ({ "--kwf-d": order * 45 + "ms" }) as React.CSSProperties
 
   return (
     <footer
@@ -680,24 +663,24 @@ export default function KilnWordmarkFooter({
       <style>{CSS}</style>
 
       <svg className="kwf-tile" viewBox={"0 0 " + size.w + " " + size.h} preserveAspectRatio="none" aria-hidden="true">
-        <ellipse ref={discRef} cx={n1(t.cx * size.w)} cy={n1(t.cy * size.h)} rx={n1(t.r * size.w)} ry={n1(t.r * size.w)} fill={surface} />
-        <rect ref={slabRef} x={n1(t.sx * size.w)} y={0} width={n1(Math.max(0, t.sw * size.w))} height={size.h} fill={surface} />
+        <ellipse ref={discRef} fill={surface} />
+        <rect ref={slabRef} y={0} height={size.h} fill={surface} />
       </svg>
 
       <div className="kwf-in-wrap">
         <div className="kwf-top">
-          <h2 className="kwf-motto kwf-fade" style={fade()}>
+          <h2 className="kwf-motto kwf-fade" style={fade(1)}>
             {motto.map((line, i) => (
               <span key={i}>{line}</span>
             ))}
           </h2>
-          <button type="button" className="kwf-key kwf-fade" style={fade()} aria-label="Back to top" onClick={backToTop}>
+          <button type="button" className="kwf-key kwf-fade" style={fade(2)} aria-label="Back to top" onClick={backToTop}>
             <ArrowUp strokeWidth={1.5} aria-hidden="true" />
           </button>
         </div>
 
         <div className="kwf-row">
-          <div className="kwf-col kwf-addr kwf-fade" style={fade()}>
+          <div className="kwf-col kwf-addr kwf-fade" style={fade(3)}>
             <h3>{brand}</h3>
             {address.map((line, i) => (
               <p key={i}>
@@ -712,7 +695,7 @@ export default function KilnWordmarkFooter({
               </p>
             ))}
           </div>
-          <nav className="kwf-col kwf-nav kwf-fade" style={fade()} aria-label={navigationTitle}>
+          <nav className="kwf-col kwf-nav kwf-fade" style={fade(4)} aria-label={navigationTitle}>
             <h3>{navigationTitle}</h3>
             <div className="kwf-cols">
               {navigation.map((col, i) => (
@@ -726,7 +709,7 @@ export default function KilnWordmarkFooter({
               ))}
             </div>
           </nav>
-          <div className="kwf-col kwf-fade" style={fade()}>
+          <div className="kwf-col kwf-fade" style={fade(5)}>
             <h3>{followTitle}</h3>
             <div className="kwf-cols">
               {socials.map((col, i) => (
@@ -758,7 +741,6 @@ export default function KilnWordmarkFooter({
                   ref={(el) => {
                     pathRefs.current[i] = el
                   }}
-                  d={glyphPath(l.ch, anim.current.k[i] ?? base, l.x)}
                   fill="var(--color-accent-lime, #C6FF3D)"
                   onClick={() => stamp(i)}
                 />
@@ -773,7 +755,7 @@ export default function KilnWordmarkFooter({
           </svg>
         )}
 
-        <div className="kwf-bar kwf-fade" style={fade()}>
+        <div className="kwf-bar kwf-fade" style={fade(6)}>
           <p className="kwf-copy">
             ©{year} {brand}
           </p>

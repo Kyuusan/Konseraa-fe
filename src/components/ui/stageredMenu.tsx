@@ -235,7 +235,6 @@ export const StaggeredMenu = ({
         const numberEls = Array.from(panel.querySelectorAll('.sm-panel-list[data-numbering] .sm-panel-item'));
         if (numberEls.length) gsap.set(numberEls, { ['--sm-num-opacity']: 0 });
 
-        const socialTitle = panel.querySelector('.sm-socials-title');
     const socialTitles = Array.from(panel.querySelectorAll('.sm-socials-title'));
         const socialLinks = Array.from(panel.querySelectorAll('.sm-socials-link, .sm-auth-btn'));
         if (socialTitles.length) gsap.set(socialTitles, { opacity: 0 });

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useRef } from "react";
@@ -9,47 +8,8 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { ArrowUpRight, MapPin } from "lucide-react";
 
 const SECTION_HEIGHT = 1500;
-
-const SCHEDULE_ITEMS = [
-  {
-    title: "The Weeknd · After Hours Til Dawn",
-    date: "Nov 14th",
-    location: "Los Angeles",
-  },
-  {
-    title: "Coldplay · Music of the Spheres",
-    date: "Nov 22nd",
-    location: "London",
-  },
-  {
-    title: "Travis Scott · Circus Maximus",
-    date: "Dec 5th",
-    location: "Milan",
-  },
-  {
-    title: "Billie Eilish · Hit Me Hard and Soft",
-    date: "Dec 18th",
-    location: "Tokyo",
-  },
-  {
-    title: "Ariana Grande · Eternal Sunshine Live",
-    date: "Jan 9th",
-    location: "London",
-  },
-  {
-    title: "Kanye West · Vultures Arena Experience",
-    date: "Jan 24th",
-    location: "Seoul",
-  },
-  {
-    title: "Bruno Mars · 24K Magic World Live",
-    date: "Feb 12th",
-    location: "Singapore",
-  },
-];
 
 export const SmoothScrollHero = () => {
   return (
