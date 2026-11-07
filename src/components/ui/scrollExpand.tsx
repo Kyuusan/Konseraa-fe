@@ -331,7 +331,7 @@ const ScrollExpand: React.FC<ScrollExpandProps> = ({
           {scrollHint ? (
             <div
               ref={hintRef}
-              className="absolute inset-x-0 bottom-5 text-center text-[0.8125rem] tracking-[0.02em] text-white/55 pointer-events-none will-change-[opacity,transform]"
+              className="absolute inset-x-0 bottom-5 text-center text-[0.8125rem] tracking-[0.02em] text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.7)] pointer-events-none will-change-[opacity,transform]"
             >
               {scrollHint}
             </div>

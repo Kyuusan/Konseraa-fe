@@ -1,0 +1,67 @@
+.scroll-word-reveal-frame {
+  position: relative;
+  width: 100%;
+  height: 300vh;
+  overflow-y: auto;
+}
+
+.scroll-word-reveal {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.scroll-word-reveal__stage {
+  width: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.scroll-word-reveal__layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.scroll-word-reveal__progress {
+  position: relative;
+  flex-shrink: 0;
+  width: 2px;
+  height: 6rem;
+  background: rgba(245, 243, 239, 0.12);
+  border-radius: 1px;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.scroll-word-reveal__progress > span {
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent-lime, #C6FF3D);
+  transform-origin: top center;
+  border-radius: 1px;
+}
+
+.scroll-word-reveal__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.scroll-word-reveal__kicker {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #8D8A99);
+  margin-bottom: 1rem;
+}
+
+.scroll-word-reveal__heading {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--color-text-primary, #F5F3EF);
+}

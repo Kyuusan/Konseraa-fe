@@ -17,8 +17,6 @@ export const About = () => {
   const sequenceImages = [
     "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop", // Band performing
     "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop", // Stage lights
-    "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=2070&auto=format&fit=crop", // Band performing
-    "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070&auto=format&fit=crop", // Stage lights
     "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop", // Party people
   ];
 
@@ -51,11 +49,11 @@ export const About = () => {
   }, [sequenceImages.length]);
 
   return (
-    <section ref={containerRef} className="relative w-full py-16">
-        {/* The Scroll Expand Container that takes up 150vh to allow scroll expansion */}
-        <div className="w-full h-[150vh] relative">
+    <section id="stage" ref={containerRef} className="relative z-20 w-full py-16 bg-bg-base">
+        {/* The Scroll Expand Container */}
+        <div className="w-full relative">
           <ScrollExpand 
-            title="RASAKAN SENSASI" 
+            title="FEEL THE ENERGY" 
             scrollHint="Scroll down to expand"
             startWidth={40}
             startHeight={50}
@@ -75,7 +73,7 @@ export const About = () => {
                 active={isActive}
                 firstContent={
                   <div className="w-full h-full bg-[#111] flex items-center justify-center">
-                    <span className="text-white/30 font-bold uppercase tracking-widest text-sm">Preparing Stage...</span>
+                    <span className="text-text-primary font-bold uppercase tracking-widest text-sm">Preparing Stage...</span>
                   </div>
                 }
                 secondContent={
@@ -111,7 +109,7 @@ export const About = () => {
           >
             <div className="text-white text-center z-10 flex flex-col items-center justify-center h-full">
               <h3 className="text-3xl md:text-8xl font-heading font-black uppercase tracking-wide mb-4 text-white">
-                PENGALAMAN LUAR BIASA
+                UNFORGETTABLE NIGHTS
               </h3>
              
             </div>
