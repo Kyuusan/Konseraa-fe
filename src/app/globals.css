@@ -14,6 +14,7 @@
   --font-mono: var(--font-geist-mono);
   --font-logo: var(--font-ethnocentric);
   --font-heading: var(--font-heading);
+  --font-signature: var(--font-signature);
 }
 
 :root {
@@ -24,8 +25,33 @@
   --glow-sweep: linear-gradient(120deg, rgba(255,61,166,0.25), rgba(198,255,61,0.18));
 }
 
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }

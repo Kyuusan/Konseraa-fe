@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Manrope, Outfit } from "next/font/google";
+import { Allura, Manrope, Outfit } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layout/navbar";
+import SmoothScroll from "@/components/layout/SmoothScroll";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -14,6 +15,12 @@ const outfit = Outfit({
   subsets: ["latin"],
 });
 
+const allura = Allura({
+  weight: "400",
+  variable: "--font-signature",
+  subsets: ["latin"],
+});
+
 const ethnocentric = localFont({
   src: "../../public/font/Ethnocentric-Regular.otf",
   variable: "--font-ethnocentric",
@@ -21,7 +28,7 @@ const ethnocentric = localFont({
 
 export const metadata: Metadata = {
   title: "Konsera - Stagelight Landing Page",
-  description: "Platform pencarian & pembelian tiket konser",
+  description: "Global concert discovery and ticketing platform",
 };
 
 export default function RootLayout({
@@ -30,10 +37,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${manrope.variable} ${outfit.variable} ${ethnocentric.variable} h-full antialiased`}>
+    <html lang="en" className={`${manrope.variable} ${outfit.variable} ${ethnocentric.variable} ${allura.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg-base text-text-primary">
-        <Navbar />
-        {children}
+        <SmoothScroll>
+          <Navbar />
+          {children}
+        </SmoothScroll>
       </body>
     </html>
   );
