@@ -83,7 +83,7 @@ export const Hero = ({ startAnimation = true }: HeroProps) => {
             <div className="hero-text text-[14vw] md:text-[10vw] font-light text-(--color-text-muted) italic ml-[8vw] md:ml-[15vw] opacity-0 w-fit">
               Global
             </div>
-            <div className="hero-text text-[14vw] md:text-[12vw] font-bold text-transparent bg-clip-text bg-linear-to-r from-(--color-accent-pink) to-(--color-accent-lime) ml-[12vw] md:ml-0 opacity-0 w-fit pb-2">
+            <div className="hero-text text-[14vw] md:text-[12vw] font-bold text-transparent bg-clip-text bg-linear-to-r from-(--color-accent-pink) to-(--color-accent-lime) ml-[12vw] md:ml-0 opacity-0 w-fit pb-[0.2em] mb-[-0.2em]">
               Stages
             </div>
           </div>
