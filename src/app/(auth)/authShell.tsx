@@ -25,7 +25,7 @@ export function AuthShell({
     <main className="min-h-screen bg-bg-base p-3 text-text-primary">
       <div className="grid min-h-[calc(100vh-1.5rem)] gap-3 lg:grid-cols-[0.94fr_1.06fr] lg:gap-6">
         <div className="flex items-start rounded-[20px] border border-border bg-bg-surface px-6 py-10 sm:px-10 lg:items-center lg:px-14 lg:py-16 xl:px-20">
-          <div className="mx-auto w-full max-w-[520px]">
+          <div className="mx-auto w-full max-w-130">
             <Link
               href="/"
               className="inline-block rounded-sm font-logo text-lg uppercase tracking-widest outline-none focus-visible:ring-2 focus-visible:ring-accent-pink"
@@ -36,7 +36,7 @@ export function AuthShell({
           </div>
         </div>
 
-        <div className="relative flex min-h-[320px] overflow-hidden rounded-[20px] bg-bg-surface p-8 sm:p-12 lg:min-h-0">
+        <div className="relative flex min-h-80 overflow-hidden rounded-[20px] bg-bg-surface p-8 sm:p-12 lg:min-h-0">
           <GrainGradient
             speed={reduceMotion ? 0 : 0.6}
             scale={1}
@@ -53,7 +53,7 @@ export function AuthShell({
           <div className="absolute inset-0 bg-bg-base/60" aria-hidden="true" />
 
           <div className="relative z-10 flex w-full flex-col justify-between gap-10">
-            <p className="max-w-[620px] font-heading text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
+            <p className="max-w-155 font-heading text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl xl:text-7xl">
               {panelLine}
               <br />
               {panelHighlight}

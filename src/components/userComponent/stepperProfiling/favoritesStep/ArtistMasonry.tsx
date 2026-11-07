@@ -14,7 +14,7 @@ export const genreLabel = (id: string) => GENRES.find((genre) => genre.id === id
 export function ArtistMasonry({ artists, selected, onToggle, query }: ArtistMasonryProps) {
   if (artists.length === 0) {
     return (
-      <p className="rounded-[16px] border border-dashed border-text-primary/20 px-4 py-10 text-center text-sm text-text-muted">
+      <p className="rounded-2xl border border-dashed border-text-primary/20 px-4 py-10 text-center text-sm text-text-muted">
         No artists match &ldquo;{query}&rdquo;. Try another name.
       </p>
     );

@@ -40,7 +40,7 @@ export function ArtistMarquee({ artists, selected, onToggle }: ArtistMarqueeProp
 
       <div
         data-lenis-prevent
-        className="group grid h-[460px] grid-cols-3 gap-3 overflow-hidden mask-[linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)] motion-reduce:overflow-y-auto motion-reduce:mask-none sm:h-[580px]"
+        className="group grid h-115 grid-cols-3 gap-3 overflow-hidden mask-[linear-gradient(to_bottom,transparent,black_10%,black_90%,transparent)] motion-reduce:overflow-y-auto motion-reduce:mask-none sm:h-145"
       >
         {columns.map((column, columnIndex) => (
           <div

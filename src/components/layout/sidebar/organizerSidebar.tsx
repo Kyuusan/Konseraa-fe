@@ -13,7 +13,7 @@ export function OrganizerSidebar() {
     <>
       <SidebarPanel
         label="Organizer"
-        className="top-[100px] h-[calc(100dvh-124px)]"
+        className="top-25 h-[calc(100dvh-124px)]"
         footer={<SidebarNav items={ORGANIZER_FOOTER_NAV} label="Organizer account" />}
       >
         <SidebarNav items={ORGANIZER_NAV} label="Organizer" />

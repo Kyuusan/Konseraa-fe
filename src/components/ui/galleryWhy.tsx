@@ -13,7 +13,7 @@ const SECTION_HEIGHT = 1500;
 
 export const SmoothScrollHero = () => {
   return (
-    <section id="why-us" className="relative z-20 bg-bg-base text-(--color-text-primary)">
+    <section id="why-us" className="relative z-20 bg-bg-base text-text-primary">
       <Hero />
     </section>
   );
@@ -80,34 +80,34 @@ const CenterImage = ({
 
 const ParallaxImages = () => {
   return (
-    <div className="relative z-10 mx-auto max-w-5xl px-4 pt-[200px]">
+    <div className="relative z-10 mx-auto max-w-5xl px-4 pt-50">
       <ParallaxImg
         src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1200&auto=format&fit=crop"
         alt="Stage laser lights over concert crowd"
         start={-200}
         end={200}
-        className="w-1/3 rounded-2xl border border-(--color-border) shadow-2xl"
+        className="w-1/3 rounded-2xl border border-border shadow-2xl"
       />
       <ParallaxImg
         src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?q=80&w=1400&auto=format&fit=crop"
         alt="Mainstage stadium pyrotechnics"
         start={200}
         end={-250}
-        className="mx-auto w-2/3 rounded-2xl border border-(--color-border) shadow-2xl"
+        className="mx-auto w-2/3 rounded-2xl border border-border shadow-2xl"
       />
       <ParallaxImg
         src="https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?q=80&w=1200&auto=format&fit=crop"
         alt="Front row live concert experience"
         start={-200}
         end={200}
-        className="ml-auto w-1/3 rounded-2xl border border-(--color-border) shadow-2xl"
+        className="ml-auto w-1/3 rounded-2xl border border-border shadow-2xl"
       />
       <ParallaxImg
         src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?q=80&w=1200&auto=format&fit=crop"
         alt="Arena spotlight performance"
         start={0}
         end={-500}
-        className="ml-24 w-5/12 rounded-2xl border border-(--color-border) shadow-2xl"
+        className="ml-24 w-5/12 rounded-2xl border border-border shadow-2xl"
       />
     </div>
   );

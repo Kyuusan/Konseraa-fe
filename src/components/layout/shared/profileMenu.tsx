@@ -88,7 +88,7 @@ export function ProfileMenu({
         <div
           role="menu"
           className={cn(
-            "absolute z-50 min-w-52 rounded-[16px] bg-bg-surface-2 p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.5)]",
+            "absolute z-50 min-w-52 rounded-2xl bg-bg-surface-2 p-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.5)]",
             placement === "bottom-end"
               ? "top-[calc(100%+8px)] right-0"
               : "bottom-0 left-[calc(100%+16px)]",

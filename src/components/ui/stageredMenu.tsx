@@ -458,7 +458,7 @@ export const StaggeredMenu = ({
         <aside
           id="staggered-menu-panel"
           ref={panelRef}
-          className={`staggered-menu-panel absolute top-0 right-0 h-full bg-(--color-bg-base) flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-md ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
+          className={`staggered-menu-panel absolute top-0 right-0 h-full bg-bg-base flex flex-col p-[6em_2em_2em_2em] overflow-y-auto z-10 backdrop-blur-md ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
           style={{ WebkitBackdropFilter: 'blur(12px)' }}
           aria-hidden={!open}
         >

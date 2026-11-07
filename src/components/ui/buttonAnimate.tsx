@@ -25,7 +25,7 @@ type ButtonSize =
   | "icon-xl";
 
 const BASE_CLASSES =
-  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full border font-sans font-bold uppercase tracking-wide outline-none transition-all duration-200 before:pointer-events-none before:absolute before:inset-0 before:rounded-full focus-visible:ring-2 focus-visible:ring-(--color-accent-lime) focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base disabled:pointer-events-none disabled:opacity-60 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:shrink-0";
+  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-full border font-sans font-bold uppercase tracking-wide outline-none transition-all duration-200 before:pointer-events-none before:absolute before:inset-0 before:rounded-full focus-visible:ring-2 focus-visible:ring-accent-lime focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base disabled:pointer-events-none disabled:opacity-60 active:scale-[0.98] [&_svg]:pointer-events-none [&_svg]:shrink-0";
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
   default: "h-10 px-5 text-xs sm:text-sm",
@@ -42,18 +42,18 @@ const SIZE_CLASSES: Record<ButtonSize, string> = {
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   default:
-    "border-(--color-accent-lime) bg-(--color-accent-lime) text-bg-base shadow-[0_1px_20px_rgba(198,255,61,0.22),inset_0_1px_0_rgba(255,255,255,0.35)] hover:brightness-105 hover:shadow-[0_4px_28px_rgba(198,255,61,0.38)] active:shadow-none",
+    "border-accent-lime bg-accent-lime text-bg-base shadow-[0_1px_20px_rgba(198,255,61,0.22),inset_0_1px_0_rgba(255,255,255,0.35)] hover:brightness-105 hover:shadow-[0_4px_28px_rgba(198,255,61,0.38)] active:shadow-none",
   outline:
-    "border-(--color-border) bg-(--color-bg-surface)/60 text-(--color-text-primary) shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm hover:border-(--color-text-primary)/25 hover:bg-white/8 active:shadow-none",
+    "border-border bg-bg-surface/60 text-text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm hover:border-text-primary/25 hover:bg-white/8 active:shadow-none",
   secondary:
-    "border-transparent bg-(--color-bg-surface-2) text-(--color-text-primary) hover:bg-(--color-bg-surface-2)/80",
+    "border-transparent bg-bg-surface-2 text-text-primary hover:bg-bg-surface-2/80",
   ghost:
-    "border-transparent bg-transparent text-(--color-text-primary) hover:bg-white/8",
+    "border-transparent bg-transparent text-text-primary hover:bg-white/8",
   destructive:
-    "border-(--color-accent-pink) bg-(--color-accent-pink) text-bg-base shadow-[0_1px_20px_rgba(255,61,166,0.25)] hover:brightness-110 active:shadow-none",
+    "border-accent-pink bg-accent-pink text-bg-base shadow-[0_1px_20px_rgba(255,61,166,0.25)] hover:brightness-110 active:shadow-none",
   "destructive-outline":
-    "border-(--color-accent-pink)/40 bg-transparent text-(--color-accent-pink) hover:bg-(--color-accent-pink)/10",
-  link: "border-transparent bg-transparent text-(--color-accent-lime) underline-offset-4 hover:underline",
+    "border-accent-pink/40 bg-transparent text-accent-pink hover:bg-accent-pink/10",
+  link: "border-transparent bg-transparent text-accent-lime underline-offset-4 hover:underline",
 };
 
 function buttonVariants({

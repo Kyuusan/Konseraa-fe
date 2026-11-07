@@ -12,7 +12,7 @@ export function AdminSidebar() {
   return (
     <SidebarPanel
       label="Admin"
-      className="top-[100px] h-[calc(100dvh-124px)]"
+      className="top-25 h-[calc(100dvh-124px)]"
       footer={<SidebarNav items={ADMIN_FOOTER_NAV} label="Admin account" />}
     >
       <SidebarNav items={ADMIN_NAV} label="Admin" />

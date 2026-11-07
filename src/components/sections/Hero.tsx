@@ -64,10 +64,10 @@ export const Hero = ({ startAnimation = true }: HeroProps) => {
       {/* Top Content mimicking the image layout */}
       <div className="w-full px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-6 mt-12 md:mt-0 hero-sub opacity-0">
         <div className="md:col-start-8 md:col-span-4 flex flex-col gap-2">
-          <p className="text-(--color-text-muted) text-xs font-semibold tracking-widest uppercase">
+          <p className="text-text-muted text-xs font-semibold tracking-widest uppercase">
             Global Concert Ticketing
           </p>
-          <p className="text-(--color-text-primary) text-sm md:text-base max-w-sm uppercase leading-relaxed font-medium">
+          <p className="text-text-primary text-sm md:text-base max-w-sm uppercase leading-relaxed font-medium">
             From sold-out world stadium tours to intimate local gigs. Experience every live moment under the lights.
           </p>
         </div>
@@ -76,14 +76,14 @@ export const Hero = ({ startAnimation = true }: HeroProps) => {
       {/* Giant Typography mimicking the image layout */}
       <div className="w-full px-6 md:px-12 flex flex-col justify-center mt-16 md:mt-24 pb-20">
         <h1 className="font-heading leading-[0.9] tracking-tight flex flex-col">
-          <div className="hero-text text-[16vw] md:text-[12vw] font-bold text-(--color-text-primary) opacity-0 w-fit">
+          <div className="hero-text text-[16vw] md:text-[12vw] font-bold text-text-primary opacity-0 w-fit">
             Witness
           </div>
           <div className="flex flex-col md:flex-row md:items-center md:gap-8">
-            <div className="hero-text text-[14vw] md:text-[10vw] font-light text-(--color-text-muted) italic ml-[8vw] md:ml-[15vw] opacity-0 w-fit">
+            <div className="hero-text text-[14vw] md:text-[10vw] font-light text-text-muted italic ml-[8vw] md:ml-[15vw] opacity-0 w-fit">
               Global
             </div>
-            <div className="hero-text text-[14vw] md:text-[12vw] font-bold text-transparent bg-clip-text bg-linear-to-r from-(--color-accent-pink) to-(--color-accent-lime) ml-[12vw] md:ml-0 opacity-0 w-fit pb-[0.2em] mb-[-0.2em]">
+            <div className="hero-text text-[14vw] md:text-[12vw] font-bold text-transparent bg-clip-text bg-linear-to-r from-accent-pink to-accent-lime ml-[12vw] md:ml-0 opacity-0 w-fit pb-[0.2em] mb-[-0.2em]">
               Stages
             </div>
           </div>

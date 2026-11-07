@@ -28,7 +28,7 @@ export const CTA = () => {
       id="encore"
       ref={sectionRef}
       aria-label="Closing Statement"
-      className="relative z-20 flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden rounded-b-[2.5rem] border-b border-(--color-border) bg-bg-base py-28 text-(--color-text-primary) shadow-[0_32px_90px_rgba(0,0,0,0.9)] md:rounded-b-[3.5rem] md:py-36"
+      className="relative z-20 flex min-h-dvh w-full flex-col items-center justify-center overflow-hidden rounded-b-[2.5rem] border-b border-border bg-bg-base py-28 text-text-primary shadow-[0_32px_90px_rgba(0,0,0,0.9)] md:rounded-b-[3.5rem] md:py-36"
     >
       {/* ── Dual Ambient Stage Orbs ── */}
       <motion.div
@@ -36,14 +36,14 @@ export const CTA = () => {
           y: reducedMotion ? 0 : yPinkOrb,
           background: "var(--glow-pink)",
         }}
-        className="pointer-events-none absolute top-1/4 left-[10%] h-[420px] w-[420px] rounded-full opacity-45 blur-[110px] md:h-[540px] md:w-[540px]"
+        className="pointer-events-none absolute top-1/4 left-[10%] h-105 w-105 rounded-full opacity-45 blur-[110px] md:h-135 md:w-135"
       />
       <motion.div
         style={{
           y: reducedMotion ? 0 : yLimeOrb,
           background: "var(--glow-lime)",
         }}
-        className="pointer-events-none absolute right-[8%] bottom-1/4 h-[400px] w-[400px] rounded-full opacity-40 blur-[110px] md:h-[520px] md:w-[520px]"
+        className="pointer-events-none absolute right-[8%] bottom-1/4 h-100 w-100 rounded-full opacity-40 blur-[110px] md:h-130 md:w-130"
       />
 
       <div className="relative mx-auto flex w-full max-w-6xl flex-col items-center justify-center px-6 text-center md:px-12">
@@ -57,7 +57,7 @@ export const CTA = () => {
                 whileInView={{ y: "0%", opacity: 1 }}
                 viewport={{ once: false, amount: 0.4 }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="inline-block font-heading text-5xl font-bold uppercase leading-[0.95] tracking-[-0.04em] text-(--color-text-primary) sm:text-7xl md:text-8xl lg:text-[7rem]"
+                className="inline-block font-heading text-5xl font-bold uppercase leading-[0.95] tracking-[-0.04em] text-text-primary sm:text-7xl md:text-8xl lg:text-[7rem]"
               >
                 Don&apos;t Miss
               </motion.span>
@@ -83,7 +83,7 @@ export const CTA = () => {
                 ease: [0.16, 1, 0.3, 1],
               }}
               style={{ y: reducedMotion ? 0 : scriptParallaxY1 }}
-              className="inline-block font-signature text-6xl lowercase leading-none tracking-normal text-(--color-accent-pink) drop-shadow-[0_0_24px_rgba(255,61,166,0.35)] sm:text-7xl md:text-8xl lg:text-[7.5rem]"
+              className="inline-block font-signature text-6xl lowercase leading-none tracking-normal text-accent-pink drop-shadow-[0_0_24px_rgba(255,61,166,0.35)] sm:text-7xl md:text-8xl lg:text-[7.5rem]"
             >
               the magic of
             </motion.span>
@@ -101,7 +101,7 @@ export const CTA = () => {
                   delay: 0.18,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="inline-block font-heading text-5xl font-normal uppercase leading-[0.95] tracking-[-0.04em] text-(--color-text-muted) sm:text-7xl md:text-8xl lg:text-[7rem]"
+                className="inline-block font-heading text-5xl font-normal uppercase leading-[0.95] tracking-[-0.04em] text-text-muted sm:text-7xl md:text-8xl lg:text-[7rem]"
               >
                 Every
               </motion.span>
@@ -127,7 +127,7 @@ export const CTA = () => {
                 ease: [0.16, 1, 0.3, 1],
               }}
               style={{ y: reducedMotion ? 0 : scriptParallaxY2 }}
-              className="inline-block px-2 font-signature text-6xl lowercase leading-none tracking-normal text-(--color-accent-lime) drop-shadow-[0_0_28px_rgba(198,255,61,0.32)] sm:text-8xl md:text-9xl lg:text-[8.5rem]"
+              className="inline-block px-2 font-signature text-6xl lowercase leading-none tracking-normal text-accent-lime drop-shadow-[0_0_28px_rgba(198,255,61,0.32)] sm:text-8xl md:text-9xl lg:text-[8.5rem]"
             >
               unforgettable
             </motion.span>
@@ -142,7 +142,7 @@ export const CTA = () => {
                   delay: 0.34,
                   ease: [0.16, 1, 0.3, 1],
                 }}
-                className="inline-block font-heading text-5xl font-bold uppercase leading-[0.95] tracking-[-0.04em] text-(--color-text-primary) sm:text-7xl md:text-8xl lg:text-[7rem]"
+                className="inline-block font-heading text-5xl font-bold uppercase leading-[0.95] tracking-[-0.04em] text-text-primary sm:text-7xl md:text-8xl lg:text-[7rem]"
               >
                 Encore.
               </motion.span>
@@ -157,11 +157,11 @@ export const CTA = () => {
             transition={{ duration: 0.8, delay: 0.45, ease: [0.16, 1, 0.3, 1] }}
             className="mt-10 flex w-full items-center justify-center gap-4"
           >
-            <span className="h-px w-10 bg-linear-to-r from-transparent to-(--color-accent-pink)" />
-            <span className="-rotate-2 font-signature text-3xl text-(--color-text-primary)/85 sm:text-4xl">
+            <span className="h-px w-10 bg-linear-to-r from-transparent to-accent-pink" />
+            <span className="-rotate-2 font-signature text-3xl text-text-primary/85 sm:text-4xl">
               See you under the stage lights
             </span>
-            <span className="h-px w-10 bg-linear-to-r from-(--color-accent-lime) to-transparent" />
+            <span className="h-px w-10 bg-linear-to-r from-accent-lime to-transparent" />
           </motion.div>
         </div>
       </div>

@@ -149,7 +149,7 @@ export function SelectDropdown({
           onKeyDown={handleListKeyDown}
           // Lets the wheel scroll this list instead of the Lenis-smoothed page.
           data-lenis-prevent
-          className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-[12px] border border-text-primary/12 bg-bg-surface-2 p-1.5 shadow-2xl outline-none"
+          className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-xl border border-text-primary/12 bg-bg-surface-2 p-1.5 shadow-2xl outline-none"
         >
           {options.map((option, index) => {
             const isSelected = option.value === value;
@@ -163,7 +163,7 @@ export function SelectDropdown({
                 onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => choose(index)}
                 className={cn(
-                  "flex cursor-pointer items-center gap-3 rounded-[8px] px-3 py-2.5 text-sm",
+                  "flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm",
                   index === activeIndex && "bg-bg-surface",
                   isSelected ? "font-semibold text-accent-lime" : "text-text-primary",
                 )}

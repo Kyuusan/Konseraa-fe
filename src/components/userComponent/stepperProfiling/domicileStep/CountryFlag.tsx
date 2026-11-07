@@ -9,7 +9,7 @@ export function CountryFlag({ code }: { code: string }) {
       width={20}
       height={15}
       loading="lazy"
-      className="h-[15px] w-5 shrink-0 rounded-[2px] object-cover"
+      className="h-[15px] w-5 shrink-0 rounded-xs object-cover"
     />
   );
 }

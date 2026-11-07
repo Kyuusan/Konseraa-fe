@@ -16,7 +16,7 @@ export default function Home() {
   const [isPreloaderDone, setIsPreloaderDone] = useState(false);
 
   return (
-    <main className="min-h-screen bg-bg-base text-(--color-text-primary)">
+    <main className="min-h-screen bg-bg-base text-text-primary">
       {/* The landing navbar belongs to this page only, not to the root layout. */}
       <Navbar />
       {!isPreloaderDone && <Preloader onComplete={() => setIsPreloaderDone(true)} />}

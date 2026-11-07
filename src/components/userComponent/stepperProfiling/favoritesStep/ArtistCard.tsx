@@ -32,7 +32,7 @@ export function ArtistCard({
       tabIndex={decorative ? -1 : undefined}
       onClick={() => onToggle(artist.id)}
       className={cn(
-        "group/card relative block w-full cursor-pointer overflow-hidden rounded-[16px] bg-bg-surface-2 text-left outline-none ring-2 transition-shadow focus-visible:ring-accent-pink",
+        "group/card relative block w-full cursor-pointer overflow-hidden rounded-2xl bg-bg-surface-2 text-left outline-none ring-2 transition-shadow focus-visible:ring-accent-pink",
         ASPECTS[index % ASPECTS.length],
         selected ? "ring-accent-lime" : "ring-transparent",
       )}

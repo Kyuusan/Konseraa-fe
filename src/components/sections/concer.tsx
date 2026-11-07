@@ -229,7 +229,7 @@ function ColorList({
       aria-label="Global Concerts"
       style={{ height: `${100 + total * 14}vh` }}
       className={cn(
-        "relative z-20 w-full bg-bg-base text-(--color-text-primary) select-none",
+        "relative z-20 w-full bg-bg-base text-text-primary select-none",
         className,
       )}
     >
@@ -311,7 +311,7 @@ function ColorList({
                     className={cn(
                       "h-2.5 w-2.5 shrink-0 rounded-full transition-all duration-300",
                       on
-                        ? "scale-100 bg-(--color-accent-lime) shadow-[0_0_16px_rgba(198,255,61,0.8)]"
+                        ? "scale-100 bg-accent-lime shadow-[0_0_16px_rgba(198,255,61,0.8)]"
                         : "scale-0 bg-transparent",
                     )}
                   />
@@ -321,8 +321,8 @@ function ColorList({
                     className={cn(
                       "font-heading text-4xl font-normal uppercase tracking-[-0.04em] transition-[transform,color] duration-300 sm:text-5xl md:text-7xl",
                       on
-                        ? "translate-x-1 text-(--color-text-primary)"
-                        : "text-(--color-text-muted) group-hover:text-(--color-text-primary)",
+                        ? "translate-x-1 text-text-primary"
+                        : "text-text-muted group-hover:text-text-primary",
                     )}
                   >
                     {item.name}
@@ -334,8 +334,8 @@ function ColorList({
                       className={cn(
                         "hidden rounded-full border px-3.5 py-1 font-sans text-xs font-semibold uppercase tracking-wider transition-colors duration-300 sm:inline-flex",
                         on
-                          ? "border-(--color-accent-pink)/40 bg-(--color-accent-pink)/15 text-(--color-text-primary)"
-                          : "border-(--color-border) bg-white/5 text-(--color-text-muted)",
+                          ? "border-accent-pink/40 bg-accent-pink/15 text-text-primary"
+                          : "border-border bg-white/5 text-text-muted",
                       )}
                     >
                       {item.badge}
@@ -351,12 +351,12 @@ function ColorList({
         {showPreview && current && (
           <div
             className={cn(
-              "pointer-events-auto absolute inset-x-4 bottom-5 z-20 flex flex-row items-center gap-3.5 overflow-hidden rounded-[20px] border border-(--color-border) bg-(--color-bg-surface)/95 p-3 shadow-2xl md:inset-x-auto md:right-12 md:bottom-10 md:flex-col md:items-stretch md:gap-0 md:p-4",
+              "pointer-events-auto absolute inset-x-4 bottom-5 z-20 flex flex-row items-center gap-3.5 overflow-hidden rounded-[20px] border border-border bg-bg-surface/95 p-3 shadow-2xl md:inset-x-auto md:right-12 md:bottom-10 md:flex-col md:items-stretch md:gap-0 md:p-4",
               SIZES[previewSize],
             )}
           >
             {/* 1. Artist Name (Desktop top header) */}
-            <h3 className="mb-3 hidden truncate font-heading text-xl font-bold uppercase tracking-tight text-(--color-text-primary) md:block">
+            <h3 className="mb-3 hidden truncate font-heading text-xl font-bold uppercase tracking-tight text-text-primary md:block">
               {current.name}
             </h3>
 
@@ -382,21 +382,21 @@ function ColorList({
             {/* 3 & 4. Info Block (Mobile: Right column with Name + Location + Price · Desktop: Below photo) */}
             <div className="flex min-w-0 flex-1 flex-col justify-center">
               {/* Artist Name on Mobile */}
-              <h3 className="truncate font-heading text-base font-bold uppercase tracking-tight text-(--color-text-primary) md:hidden">
+              <h3 className="truncate font-heading text-base font-bold uppercase tracking-tight text-text-primary md:hidden">
                 {current.name}
               </h3>
 
               {/* Location */}
-              <p className="mt-0.5 truncate font-sans text-xs font-medium tracking-wide text-(--color-text-muted) md:mt-3">
+              <p className="mt-0.5 truncate font-sans text-xs font-medium tracking-wide text-text-muted md:mt-3">
                 {current.location}
               </p>
 
               {/* Ticket Price (Start from) in USD */}
-              <div className="mt-2 flex items-baseline justify-between border-t border-dashed border-(--color-border) pt-2 md:mt-2.5 md:pt-2.5">
-                <span className="font-sans text-[10px] font-semibold uppercase tracking-widest text-(--color-text-muted) md:text-[11px]">
+              <div className="mt-2 flex items-baseline justify-between border-t border-dashed border-border pt-2 md:mt-2.5 md:pt-2.5">
+                <span className="font-sans text-[10px] font-semibold uppercase tracking-widest text-text-muted md:text-[11px]">
                   Start from
                 </span>
-                <span className="font-heading text-base font-normal tracking-tight text-(--color-accent-lime) md:text-lg">
+                <span className="font-heading text-base font-normal tracking-tight text-accent-lime md:text-lg">
                   {current.price}
                 </span>
               </div>
