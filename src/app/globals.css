@@ -47,6 +47,12 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Vertical marquee: the track holds its items repeated, so moving by half loops seamlessly. */
+@keyframes marquee-y {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
 .scrollbar-none {
   -ms-overflow-style: none;
   scrollbar-width: none;

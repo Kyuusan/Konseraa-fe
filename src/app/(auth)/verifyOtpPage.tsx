@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import type { ClipboardEvent, SubmitEvent, KeyboardEvent } from "react";
 import { AuthHeading, SubmitButton } from "./authUi";
@@ -9,6 +10,7 @@ const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
 
 export default function VerifyOtpPage({ email }: { email?: string }) {
+  const router = useRouter();
   const [digits, setDigits] = useState<string[]>(() => Array(OTP_LENGTH).fill(""));
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
@@ -76,7 +78,10 @@ export default function VerifyOtpPage({ email }: { email?: string }) {
       />
 
       <form
-        onSubmit={(event: SubmitEvent<HTMLFormElement>) => event.preventDefault()}
+        onSubmit={(event: SubmitEvent<HTMLFormElement>) => {
+          event.preventDefault();
+          if (isComplete) router.push("/profiling");
+        }}
         className="mt-10 space-y-6"
       >
         <div role="group" aria-label="Verification code" className="grid grid-cols-6 gap-2 sm:gap-3">
