@@ -15,7 +15,7 @@ const socialItems: SocialItem[] = [
   { label: 'Twitter / X', link: 'https://twitter.com' },
 ];
 
-const routesWithoutNavbar = ['/login', '/register', '/admin/login'];
+const routesWithoutNavbar = ['/login', '/register', '/verify-otp', '/admin/login'];
 
 export const Navbar = () => {
   const pathname = usePathname();
