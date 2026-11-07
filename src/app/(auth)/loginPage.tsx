@@ -5,7 +5,7 @@ import {
   AuthHeading,
   CheckboxLine,
   FieldBox,
-  GoogleButton,
+  SocialButtons,
   OrDivider,
   PasswordField,
   SubmitButton,
@@ -15,7 +15,7 @@ export default function LoginPage() {
   return (
     <>
       <AuthHeading title="Welcome back" subtitle="Your next show is waiting" />
-      <GoogleButton />
+      <SocialButtons />
       <OrDivider />
 
       <form onSubmit={(event) => event.preventDefault()} className="space-y-4">

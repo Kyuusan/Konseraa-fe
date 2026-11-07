@@ -4,7 +4,7 @@ import { Check, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
 
-export function AuthHeading({ title, subtitle }: { title: string; subtitle: string }) {
+export function AuthHeading({ title, subtitle }: { title: string; subtitle: ReactNode }) {
   return (
     <div className="mt-10">
       <h1 className="font-heading text-4xl font-semibold leading-[1.05] tracking-tight xl:text-5xl">
@@ -15,14 +15,23 @@ export function AuthHeading({ title, subtitle }: { title: string; subtitle: stri
   );
 }
 
-export function GoogleButton() {
+export function SocialButtons() {
+  return (
+    <div className="mt-10 grid gap-3 sm:grid-cols-2">
+      <SocialButton icon={<GoogleIcon />} label="Continue with Google" />
+      <SocialButton icon={<AppleIcon />} label="Continue with Apple" />
+    </div>
+  );
+}
+
+function SocialButton({ icon, label }: { icon: ReactNode; label: string }) {
   return (
     <button
       type="button"
-      className="mt-10 flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-text-primary/20 text-base font-medium outline-none transition-colors hover:bg-bg-surface-2 focus-visible:ring-2 focus-visible:ring-accent-pink"
+      className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-text-primary/20 px-4 text-sm font-medium outline-none transition-colors hover:bg-bg-surface-2 focus-visible:ring-2 focus-visible:ring-accent-pink xl:text-base"
     >
-      <GoogleIcon />
-      Continue with Google
+      {icon}
+      <span className="whitespace-nowrap">{label}</span>
     </button>
   );
 }
@@ -98,18 +107,27 @@ export function CheckboxLine({
   );
 }
 
-export function SubmitButton({ children }: { children: ReactNode }) {
+export function SubmitButton({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   return (
     <button
       type="submit"
-      className="flex h-12 w-full cursor-pointer items-center justify-center rounded-full bg-[linear-gradient(90deg,var(--color-accent-lime)_50%,color-mix(in_srgb,var(--color-accent-lime)_80%,var(--color-bg-base))_50%)] bg-size-[200%_100%] bg-right text-base font-semibold text-bg-base outline-none transition-[background-position] duration-300 hover:bg-left focus-visible:ring-2 focus-visible:ring-accent-pink focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface motion-reduce:transition-none"
+      disabled={disabled}
+      className="flex h-12 w-full cursor-pointer items-center justify-center rounded-full bg-[linear-gradient(90deg,var(--color-accent-lime)_50%,color-mix(in_srgb,var(--color-accent-lime)_80%,var(--color-bg-base))_50%)] bg-size-[200%_100%] bg-right text-base font-semibold text-bg-base outline-none transition-[background-position] duration-300 hover:bg-left focus-visible:ring-2 focus-visible:ring-accent-pink focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-right"
     >
       {children}
     </button>
   );
 }
 
-// lucide-react has no Google logo, so this one brand mark stays as its own SVG.
+// lucide-react has no Google or Apple logos, so these brand marks stay as SVG.
+function AppleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.05 12.54c-.03-3.02 2.47-4.47 2.58-4.54-1.41-2.06-3.6-2.34-4.38-2.37-1.86-.19-3.64 1.1-4.58 1.1-.95 0-2.42-1.07-3.98-1.04-2.05.03-3.94 1.19-4.99 3.02-2.13 3.69-.54 9.16 1.53 12.15 1.01 1.46 2.22 3.1 3.81 3.04 1.53-.06 2.11-.99 3.96-.99s2.37.99 3.99.96c1.65-.03 2.69-1.49 3.69-2.96 1.16-1.69 1.64-3.33 1.66-3.41-.04-.02-3.2-1.23-3.24-4.87ZM14.03 3.66c.84-1.02 1.41-2.43 1.25-3.84-1.21.05-2.68.81-3.55 1.83-.78.9-1.46 2.34-1.28 3.72 1.35.1 2.73-.69 3.58-1.71Z" />
+    </svg>
+  );
+}
+
 function GoogleIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">

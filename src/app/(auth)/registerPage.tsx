@@ -1,24 +1,41 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { SubmitEvent } from "react";
 import {
   AuthHeading,
   CheckboxLine,
   FieldBox,
-  GoogleButton,
   OrDivider,
   PasswordField,
+  SocialButtons,
   SubmitButton,
 } from "./authUi";
 
 export default function RegisterPage() {
+  const router = useRouter();
+
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const confirm = form.elements.namedItem("confirmPassword") as HTMLInputElement;
+    const password = form.elements.namedItem("password") as HTMLInputElement;
+
+    confirm.setCustomValidity(confirm.value === password.value ? "" : "Passwords don't match.");
+    if (!form.reportValidity()) return;
+
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+  }
+
   return (
     <>
       <AuthHeading title="Create an account" subtitle="From world arenas to local gigs" />
-      <GoogleButton />
+      <SocialButtons />
       <OrDivider />
 
-      <form onSubmit={(event) => event.preventDefault()} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FieldBox
           name="name"
           label="Name"
@@ -51,6 +68,7 @@ export default function RegisterPage() {
             autoComplete="new-password"
             minLength={8}
             required
+            onInput={(event) => event.currentTarget.setCustomValidity("")}
           />
         </div>
         <CheckboxLine name="acceptTerms" required>
