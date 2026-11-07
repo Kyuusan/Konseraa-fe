@@ -73,18 +73,18 @@ export const Preloader = ({ onComplete }: PreloaderProps) => {
         });
 
         // Fade out the preloader background and show the real navbar logo
-        tl.to(
-          containerRef.current,
-          {
-            opacity: 0,
-            duration: 0.5,
-            ease: "power2.out",
-            onComplete: () => {
-              gsap.set(navLogo, { opacity: 1 });
-            }
-          },
-          "-=0.3" // Overlap slightly with the end of the scale animation
-        );
+        // tl.to(
+        //   containerRef.current,
+        //   {
+        //     opacity: 0,
+        //     duration: 0.5,
+        //     ease: "power2.out",
+        //     onComplete: () => {
+        //       gsap.set(navLogo, { opacity: 1 });
+        //     }
+        //   },
+        //   "-=0.3" // Overlap slightly with the end of the scale animation
+        // );
       } else {
         // Fallback if navLogo isn't found
         tl.to(containerRef.current, {
