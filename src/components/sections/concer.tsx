@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import * as React from "react";
@@ -10,7 +9,9 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
+import { Ticket } from "lucide-react";
 
+import { Button } from "@/components/ui/buttonAnimate";
 import { cn } from "@/lib/utils";
 
 /**
@@ -399,6 +400,15 @@ function ColorList({
                   {current.price}
                 </span>
               </div>
+
+              <Button
+                size="sm"
+                aria-label={`Buy tickets for ${current.name}`}
+                className="mt-2.5 w-full bg-[linear-gradient(90deg,var(--color-accent-lime)_50%,color-mix(in_srgb,var(--color-accent-lime)_80%,var(--color-bg-base))_50%)] bg-size-[200%_100%] bg-right transition-[background-position,transform] duration-300 hover:bg-left hover:brightness-100 motion-reduce:transition-none md:mt-3 md:h-10"
+              >
+                <Ticket className="size-4" aria-hidden="true" />
+                Buy now
+              </Button>
             </div>
           </div>
         )}
