@@ -2,7 +2,7 @@
 
 import { COUNTRIES } from "../data/locations";
 import { CountryFlag } from "./CountryFlag";
-import { SelectDropdown } from "./SelectDropdown";
+import { LocationSelect } from "./LocationSelect";
 
 export interface Domicile {
   country: string;
@@ -29,7 +29,7 @@ export function DomicileStep({ value, onChange }: DomicileStepProps) {
 
   return (
     <div className="grid gap-5 md:grid-cols-3">
-      <SelectDropdown
+      <LocationSelect
         id="domicile-country"
         label="Country"
         placeholder="Select country"
@@ -38,7 +38,7 @@ export function DomicileStep({ value, onChange }: DomicileStepProps) {
         // A new country invalidates the province and city picked under the old one.
         onChange={(code) => onChange({ country: code, province: "", city: "" })}
       />
-      <SelectDropdown
+      <LocationSelect
         id="domicile-province"
         label="Province / State"
         placeholder={country ? "Select province" : "Pick a country first"}
@@ -47,7 +47,7 @@ export function DomicileStep({ value, onChange }: DomicileStepProps) {
         onChange={(name) => onChange({ ...value, province: name, city: "" })}
         disabled={!country}
       />
-      <SelectDropdown
+      <LocationSelect
         id="domicile-city"
         label="City"
         placeholder={province ? "Select city" : "Pick a province first"}

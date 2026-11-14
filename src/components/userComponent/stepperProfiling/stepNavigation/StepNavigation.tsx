@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/buttonAnimate";
+import { Button } from "@/components/animate-ui/components/buttons/button";
 
 interface StepNavigationProps {
   activeStep: number;
@@ -20,16 +20,16 @@ export function StepNavigation({
 
   return (
     <div className="flex items-center justify-between gap-3">
-      <Button variant="outline" onClick={onBack} disabled={activeStep === 0}>
-        <ChevronLeft className="size-4" aria-hidden="true" />
+      <Button variant="outline" hoverScale={1} onClick={onBack} disabled={activeStep === 0} className="h-11 rounded-full px-5">
+        <ChevronLeft aria-hidden="true" />
         Back
       </Button>
       <p className="text-sm text-text-muted">
         Step {activeStep + 1} of {totalSteps}
       </p>
-      <Button onClick={onNext} disabled={!canContinue}>
+      <Button hoverScale={1.02} onClick={onNext} disabled={!canContinue} className="h-11 rounded-full px-5 font-semibold">
         {isLast ? "Finish" : "Continue"}
-        <ChevronRight className="size-4" aria-hidden="true" />
+        <ChevronRight aria-hidden="true" />
       </Button>
     </div>
   );

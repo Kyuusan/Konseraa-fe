@@ -1,7 +1,8 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Check, type LucideIcon } from "lucide-react";
+import { Button } from "@/components/animate-ui/components/buttons/button";
 import { cn } from "@/lib/utils";
 
 export interface ProfilingStep {
@@ -53,13 +54,16 @@ export function StepIndicator({ steps, activeStep, onStepClick }: StepIndicatorP
 
           return (
             <li key={step.id} className="flex flex-1 flex-col items-center gap-2">
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="icon"
+                hoverScale={isCompleted ? 1.05 : 1}
+                tapScale={isCompleted ? 0.95 : 1}
                 onClick={() => onStepClick(index)}
                 disabled={!isCompleted}
                 aria-current={isActive ? "step" : undefined}
                 aria-label={`${step.title} step${isCompleted ? ", completed" : ""}`}
-                className="group relative z-10 flex size-10 items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent-pink focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base enabled:cursor-pointer"
+                className="group relative z-10 size-10 rounded-full p-0 hover:bg-transparent focus-visible:ring-2 focus-visible:ring-accent-pink focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base disabled:opacity-100"
               >
                 <span
                   className={cn(
@@ -99,7 +103,7 @@ export function StepIndicator({ steps, activeStep, onStepClick }: StepIndicatorP
                     </motion.span>
                   </AnimatePresence>
                 </motion.span>
-              </button>
+              </Button>
               <span
                 className={cn(
                   "text-xs font-semibold uppercase tracking-wider transition-colors duration-300",

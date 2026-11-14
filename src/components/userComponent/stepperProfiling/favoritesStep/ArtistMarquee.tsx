@@ -3,6 +3,7 @@
 import { Pause, Play } from "lucide-react";
 import { useState } from "react";
 import type { CSSProperties } from "react";
+import { Button } from "@/components/animate-ui/components/buttons/button";
 import { cn } from "@/lib/utils";
 import type { Artist } from "../data/music";
 import { ArtistCard } from "./ArtistCard";
@@ -28,15 +29,17 @@ export function ArtistMarquee({ artists, selected, onToggle }: ArtistMarqueeProp
 
   return (
     <div className="relative">
-      <button
-        type="button"
+      <Button
+        variant="outline"
+        size="icon"
+        hoverScale={1}
         onClick={() => setPaused((current) => !current)}
         aria-pressed={paused}
         aria-label={paused ? "Play artist scroll" : "Pause artist scroll"}
-        className="absolute top-3 right-3 z-10 flex size-10 cursor-pointer items-center justify-center rounded-full border border-text-primary/20 bg-bg-base/80 text-text-primary outline-none backdrop-blur-sm transition-colors hover:border-text-primary/50 focus-visible:ring-2 focus-visible:ring-accent-pink motion-reduce:hidden"
+        className="absolute top-3 right-3 z-10 size-10 rounded-full bg-bg-base/80 backdrop-blur-sm motion-reduce:hidden"
       >
-        {paused ? <Play className="size-4" aria-hidden="true" /> : <Pause className="size-4" aria-hidden="true" />}
-      </button>
+        {paused ? <Play /> : <Pause />}
+      </Button>
 
       <div
         data-lenis-prevent
@@ -47,9 +50,9 @@ export function ArtistMarquee({ artists, selected, onToggle }: ArtistMarqueeProp
             key={columnIndex}
             style={{ "--marquee-duration": COLUMN_DURATIONS[columnIndex] } as CSSProperties}
             className={cn(
-              "animate-[marquee-y_var(--marquee-duration)_linear_infinite] group-focus-within:[animation-play-state:paused] group-hover:[animation-play-state:paused] motion-reduce:animate-none",
+              "animate-[marquee-y_var(--marquee-duration)_linear_infinite] group-focus-within:paused group-hover:paused motion-reduce:animate-none",
               columnIndex % 2 === 1 && "[animation-direction:reverse]",
-              paused && "[animation-play-state:paused]",
+              paused && "paused",
             )}
           >
             {Array.from({ length: COPIES }, (_, copy) =>

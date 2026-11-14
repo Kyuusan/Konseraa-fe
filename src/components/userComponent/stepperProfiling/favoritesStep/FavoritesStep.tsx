@@ -52,7 +52,7 @@ export function FavoritesStep({
         <GenreBadgeList
           genres={GENRES}
           selected={genres}
-          onToggle={(id) => onGenresChange(toggle(genres, id))}
+          onChange={onGenresChange}
         />
       </section>
 

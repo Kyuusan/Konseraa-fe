@@ -1,10 +1,11 @@
-/* eslint-disable @next/next/no-img-element */
 import { Check } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/animate-ui/components/buttons/button";
 import { cn } from "@/lib/utils";
 import type { Artist } from "../data/music";
 
 // Varying heights are what make the masonry columns stagger.
-const ASPECTS = ["aspect-[3/4]", "aspect-square", "aspect-[4/5]"];
+const ASPECTS = ["aspect-3/4", "aspect-square", "aspect-4/5"];
 
 interface ArtistCardProps {
   artist: Artist;
@@ -16,34 +17,29 @@ interface ArtistCardProps {
   decorative?: boolean;
 }
 
-export function ArtistCard({
-  artist,
-  genreLabel,
-  index,
-  selected,
-  onToggle,
-  decorative,
-}: ArtistCardProps) {
+export function ArtistCard({ artist, genreLabel, index, selected, onToggle, decorative }: ArtistCardProps) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      hoverScale={1}
+      tapScale={0.98}
       aria-pressed={selected}
       aria-hidden={decorative || undefined}
       tabIndex={decorative ? -1 : undefined}
       onClick={() => onToggle(artist.id)}
       className={cn(
-        "group/card relative block w-full cursor-pointer overflow-hidden rounded-2xl bg-bg-surface-2 text-left outline-none ring-2 transition-shadow focus-visible:ring-accent-pink",
+        "group/card relative block h-auto w-full overflow-hidden rounded-2xl bg-bg-surface-2 p-0 text-left whitespace-normal ring-2 transition-shadow hover:bg-bg-surface-2 focus-visible:ring-accent-pink",
         ASPECTS[index % ASPECTS.length],
         selected ? "ring-accent-lime" : "ring-transparent",
       )}
     >
-      <img
+      <Image
         src={artist.image}
         alt=""
-        loading="lazy"
-        className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover/card:scale-105 motion-reduce:transition-none motion-reduce:group-hover/card:scale-100"
+        fill
+        sizes="(min-width: 1024px) 15vw, 33vw"
+        className="object-cover transition-transform duration-500 group-hover/card:scale-105 motion-reduce:transition-none motion-reduce:group-hover/card:scale-100"
       />
-      <span className="absolute inset-0 bg-linear-to-t from-bg-base/95 via-bg-base/30 to-transparent" />
 
       {selected && (
         <span className="absolute top-2.5 right-2.5 flex size-7 items-center justify-center rounded-full bg-accent-lime text-bg-base">
@@ -51,12 +47,12 @@ export function ArtistCard({
         </span>
       )}
 
-      <span className="absolute inset-x-3 bottom-3 block">
+      <span className="absolute inset-x-2 bottom-2 block rounded-xl bg-bg-base/80 px-3 py-2 backdrop-blur-sm">
         <span className="block truncate font-heading text-sm font-semibold text-text-primary sm:text-base">
           {artist.name}
         </span>
-        <span className="block text-xs font-medium text-text-primary/80">{genreLabel}</span>
+        <span className="block text-xs font-medium text-text-muted">{genreLabel}</span>
       </span>
-    </button>
+    </Button>
   );
 }

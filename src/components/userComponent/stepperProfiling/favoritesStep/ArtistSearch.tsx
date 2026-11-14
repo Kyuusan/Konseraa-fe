@@ -1,4 +1,6 @@
 import { Search, X } from "lucide-react";
+import { Button } from "@/components/animate-ui/components/buttons/button";
+import { Input } from "@/components/ui/input";
 
 interface ArtistSearchProps {
   value: string;
@@ -7,26 +9,28 @@ interface ArtistSearchProps {
 
 export function ArtistSearch({ value, onChange }: ArtistSearchProps) {
   return (
-    <label className="flex h-12 items-center gap-3 rounded-[10px] border border-text-primary/12 bg-bg-surface-2 px-4 transition-colors focus-within:border-accent-pink focus-within:ring-1 focus-within:ring-accent-pink">
-      <Search className="size-4 shrink-0 text-text-muted" aria-hidden="true" />
-      <input
+    <div className="relative">
+      <Search className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-text-muted" aria-hidden="true" />
+      <Input
         type="search"
         value={value}
         onChange={(event) => onChange(event.target.value)}
         placeholder="Search artists or bands"
         aria-label="Search artists or bands"
-        className="min-w-0 flex-1 bg-transparent text-base text-text-primary outline-none placeholder:text-text-muted [&::-webkit-search-cancel-button]:hidden"
+        className="h-12 rounded-[10px] bg-bg-surface-2 pr-12 pl-11 text-base [&::-webkit-search-cancel-button]:hidden"
       />
       {value && (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          hoverScale={1}
           onClick={() => onChange("")}
           aria-label="Clear search"
-          className="shrink-0 cursor-pointer rounded-sm text-text-primary outline-none hover:text-accent-lime focus-visible:ring-2 focus-visible:ring-accent-pink"
+          className="absolute top-1/2 right-2 -translate-y-1/2 rounded-full"
         >
-          <X className="size-4" aria-hidden="true" />
-        </button>
+          <X />
+        </Button>
       )}
-    </label>
+    </div>
   );
 }
