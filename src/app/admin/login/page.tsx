@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AuthHeading, FieldBox, PasswordField, SubmitButton } from "@/app/(auth)/authUi";
+import { Button } from "@/components/animate-ui/components/buttons/button";
 
 export default function Page() {
   const [showForgotInfo, setShowForgotInfo] = useState(false);
@@ -30,13 +31,14 @@ export default function Page() {
       </form>
 
       <div className="mt-6 text-center text-sm">
-        <button
-          type="button"
+        <Button
+          variant="link"
+          hoverScale={1}
           onClick={() => setShowForgotInfo(true)}
-          className="cursor-pointer rounded-sm font-medium text-accent-lime underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-accent-pink"
+          className="h-auto p-0 font-medium text-accent-lime"
         >
           Forgot password?
-        </button>
+        </Button>
         {showForgotInfo && (
           <p role="status" className="mt-2 text-text-primary">
             Contact the Super Admin to reset your password.

@@ -1,8 +1,13 @@
 "use client";
 
-import { Check, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
+import { useId, useState } from "react";
 import type { ComponentProps, ReactNode } from "react";
+import { Button } from "@/components/animate-ui/components/buttons/button";
+import { Checkbox } from "@/components/animate-ui/components/radix/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 export function AuthHeading({ title, subtitle }: { title: string; subtitle: ReactNode }) {
   return (
@@ -26,13 +31,14 @@ export function SocialButtons() {
 
 function SocialButton({ icon, label }: { icon: ReactNode; label: string }) {
   return (
-    <button
-      type="button"
-      className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full border border-text-primary/20 px-4 text-sm font-medium outline-none transition-colors hover:bg-bg-surface-2 focus-visible:ring-2 focus-visible:ring-accent-pink xl:text-base"
+    <Button
+      variant="outline"
+      hoverScale={1}
+      className="h-12 w-full rounded-full px-4 text-sm font-medium xl:text-base"
     >
       {icon}
       <span className="whitespace-nowrap">{label}</span>
-    </button>
+    </Button>
   );
 }
 
@@ -40,25 +46,31 @@ export function OrDivider() {
   return <div className="my-7 text-center text-sm font-medium text-text-muted">or</div>;
 }
 
-type FieldBoxProps = ComponentProps<"input"> & {
+type FieldBoxProps = Omit<ComponentProps<typeof Input>, "id"> & {
   label: string;
   ariaLabel?: string;
   trailing?: ReactNode;
 };
 
-export function FieldBox({ label, ariaLabel, trailing, ...inputProps }: FieldBoxProps) {
+export function FieldBox({ label, ariaLabel, trailing, className, ...inputProps }: FieldBoxProps) {
+  const id = useId();
+
   return (
-    <label className="flex h-14 items-center gap-3 rounded-[10px] border border-text-primary/12 bg-bg-surface-2 px-5 transition-colors focus-within:border-accent-pink focus-within:ring-1 focus-within:ring-accent-pink">
-      <input
+    <div className="flex h-14 items-center gap-3 rounded-[10px] border border-text-primary/12 bg-bg-surface-2 px-5 transition-colors focus-within:border-accent-pink focus-within:ring-1 focus-within:ring-accent-pink">
+      <Input
         {...inputProps}
-        aria-label={ariaLabel ?? label}
-        className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-text-muted [&::-ms-reveal]:hidden [&:-webkit-autofill]:shadow-[inset_0_0_0_100px_var(--color-bg-surface-2)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--color-text-primary)]"
+        id={id}
+        aria-label={ariaLabel}
+        className={cn(
+          "h-auto min-w-0 flex-1 rounded-none border-0 bg-transparent px-0 text-base shadow-none focus-visible:ring-0 dark:bg-transparent [&::-ms-reveal]:hidden [&:-webkit-autofill]:shadow-[inset_0_0_0_100px_var(--color-bg-surface-2)] [&:-webkit-autofill]:[-webkit-text-fill-color:var(--color-text-primary)]",
+          className,
+        )}
       />
-      <span className="shrink-0 text-sm font-medium text-text-primary" aria-hidden="true">
+      <Label htmlFor={id} className="shrink-0 text-sm font-medium">
         {label}
-      </span>
+      </Label>
       {trailing}
-    </label>
+    </div>
   );
 }
 
@@ -71,51 +83,55 @@ export function PasswordField(props: Omit<FieldBoxProps, "type" | "trailing">) {
       {...props}
       type={visible ? "text" : "password"}
       trailing={
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          hoverScale={1}
           onClick={() => setVisible((current) => !current)}
           aria-label={visible ? "Hide password" : "Show password"}
-          className="shrink-0 cursor-pointer rounded-sm text-text-primary outline-none transition-colors hover:text-accent-lime focus-visible:ring-2 focus-visible:ring-accent-pink"
+          className="shrink-0 rounded-full hover:text-accent-lime"
         >
           <Icon className="size-5" aria-hidden="true" />
-        </button>
+        </Button>
       }
     />
   );
 }
 
-export function CheckboxLine({
-  children,
-  ...inputProps
-}: ComponentProps<"input"> & { children: ReactNode }) {
+interface CheckboxLineProps {
+  name: string;
+  required?: boolean;
+  children: ReactNode;
+}
+
+export function CheckboxLine({ name, required, children }: CheckboxLineProps) {
+  const id = useId();
+
   return (
-    <label className="flex items-start gap-3 text-sm leading-5 text-text-primary">
-      <span className="relative mt-0.5 size-4 shrink-0">
-        <input
-          {...inputProps}
-          type="checkbox"
-          className="peer size-full appearance-none rounded-[3px] border border-text-primary/50 bg-bg-surface-2 outline-none checked:border-accent-lime checked:bg-accent-lime focus-visible:ring-2 focus-visible:ring-accent-pink"
-        />
-        <Check
-          className="pointer-events-none absolute inset-0 hidden size-full p-0.5 text-bg-base peer-checked:block"
-          strokeWidth={3}
-          aria-hidden="true"
-        />
-      </span>
-      <span>{children}</span>
-    </label>
+    <div className="flex items-start gap-3">
+      <Checkbox
+        id={id}
+        name={name}
+        required={required}
+        className="mt-0.5 border-text-primary/50 data-[state=checked]:border-accent-lime data-[state=checked]:bg-accent-lime data-[state=checked]:text-bg-base"
+      />
+      <Label htmlFor={id} className="text-sm leading-5 font-normal">
+        {children}
+      </Label>
+    </div>
   );
 }
 
 export function SubmitButton({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   return (
-    <button
+    <Button
       type="submit"
       disabled={disabled}
-      className="flex h-12 w-full cursor-pointer items-center justify-center rounded-full bg-[linear-gradient(90deg,var(--color-accent-lime)_50%,color-mix(in_srgb,var(--color-accent-lime)_80%,var(--color-bg-base))_50%)] bg-size-[200%_100%] bg-right text-base font-semibold text-bg-base outline-none transition-[background-position] duration-300 hover:bg-left focus-visible:ring-2 focus-visible:ring-accent-pink focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-right"
+      hoverScale={1}
+      className="h-12 w-full rounded-full bg-[linear-gradient(90deg,var(--color-accent-lime)_50%,color-mix(in_srgb,var(--color-accent-lime)_80%,var(--color-bg-base))_50%)] bg-size-[200%_100%] bg-right text-base font-semibold text-bg-base transition-[background-position] duration-300 hover:bg-left focus-visible:ring-2 focus-visible:ring-accent-pink focus-visible:ring-offset-2 focus-visible:ring-offset-bg-surface motion-reduce:transition-none disabled:hover:bg-right"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

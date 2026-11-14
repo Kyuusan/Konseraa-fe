@@ -1,20 +1,24 @@
 "use client";
 
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import type { ClipboardEvent, SubmitEvent, KeyboardEvent } from "react";
+import { type SubmitEvent, useEffect, useState } from "react";
+import { Button } from "@/components/animate-ui/components/buttons/button";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { AuthHeading, SubmitButton } from "./authUi";
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 60;
 
+const SLOT =
+  "h-14 flex-1 rounded-[10px] border border-text-primary/12 bg-bg-surface-2 font-heading text-2xl font-semibold first:rounded-l-[10px] first:border-l last:rounded-r-[10px] data-[active=true]:border-accent-pink data-[active=true]:ring-1 data-[active=true]:ring-accent-pink sm:h-16 dark:bg-bg-surface-2";
+
 export default function VerifyOtpPage({ email }: { email?: string }) {
   const router = useRouter();
-  const [digits, setDigits] = useState<string[]>(() => Array(OTP_LENGTH).fill(""));
+  const [code, setCode] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(RESEND_SECONDS);
-  const inputs = useRef<(HTMLInputElement | null)[]>([]);
-  const isComplete = digits.every(Boolean);
+  const isComplete = code.length === OTP_LENGTH;
 
   useEffect(() => {
     if (secondsLeft === 0) return;
@@ -22,47 +26,9 @@ export default function VerifyOtpPage({ email }: { email?: string }) {
     return () => clearTimeout(timer);
   }, [secondsLeft]);
 
-  // Writes digits starting at `start`, so typing, pasting and SMS/email
-  // autofill (which can drop the whole code into one box) all work.
-  function fillFrom(start: number, raw: string) {
-    const incoming = raw.replace(/\D/g, "").slice(0, OTP_LENGTH - start).split("");
-    if (incoming.length === 0) return;
-    setDigits((current) => {
-      const next = [...current];
-      incoming.forEach((digit, offset) => {
-        next[start + offset] = digit;
-      });
-      return next;
-    });
-    inputs.current[Math.min(start + incoming.length, OTP_LENGTH - 1)]?.focus();
-  }
-
-  function handleKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
-    if (event.key === "Backspace") {
-      event.preventDefault();
-      setDigits((current) => {
-        const next = [...current];
-        const target = current[index] ? index : Math.max(index - 1, 0);
-        next[target] = "";
-        inputs.current[target]?.focus();
-        return next;
-      });
-    } else if (event.key === "ArrowLeft") {
-      inputs.current[index - 1]?.focus();
-    } else if (event.key === "ArrowRight") {
-      inputs.current[index + 1]?.focus();
-    }
-  }
-
-  function handlePaste(index: number, event: ClipboardEvent<HTMLInputElement>) {
-    event.preventDefault();
-    fillFrom(index, event.clipboardData.getData("text"));
-  }
-
   function handleResend() {
-    setDigits(Array(OTP_LENGTH).fill(""));
+    setCode("");
     setSecondsLeft(RESEND_SECONDS);
-    inputs.current[0]?.focus();
   }
 
   return (
@@ -84,26 +50,21 @@ export default function VerifyOtpPage({ email }: { email?: string }) {
         }}
         className="mt-10 space-y-6"
       >
-        <div role="group" aria-label="Verification code" className="grid grid-cols-6 gap-2 sm:gap-3">
-          {digits.map((digit, index) => (
-            <input
-              key={index}
-              ref={(element) => {
-                inputs.current[index] = element;
-              }}
-              value={digit}
-              onChange={(event) => fillFrom(index, event.target.value)}
-              onKeyDown={(event) => handleKeyDown(index, event)}
-              onPaste={(event) => handlePaste(index, event)}
-              onFocus={(event) => event.currentTarget.select()}
-              inputMode="numeric"
-              autoComplete={index === 0 ? "one-time-code" : "off"}
-              aria-label={`Digit ${index + 1} of ${OTP_LENGTH}`}
-              autoFocus={index === 0}
-              className="h-14 w-full min-w-0 rounded-[10px] border border-text-primary/12 bg-bg-surface-2 text-center font-heading text-2xl font-semibold text-text-primary caret-accent-pink outline-none transition-colors focus:border-accent-pink focus:ring-1 focus:ring-accent-pink sm:h-16"
-            />
-          ))}
-        </div>
+        <InputOTP
+          maxLength={OTP_LENGTH}
+          pattern={REGEXP_ONLY_DIGITS}
+          value={code}
+          onChange={setCode}
+          autoFocus
+          aria-label="Verification code"
+          containerClassName="w-full"
+        >
+          <InputOTPGroup className="grid w-full grid-cols-6 gap-2 sm:gap-3">
+            {Array.from({ length: OTP_LENGTH }, (_, index) => (
+              <InputOTPSlot key={index} index={index} className={SLOT} />
+            ))}
+          </InputOTPGroup>
+        </InputOTP>
 
         <SubmitButton disabled={!isComplete}>Verify</SubmitButton>
       </form>
@@ -114,21 +75,14 @@ export default function VerifyOtpPage({ email }: { email?: string }) {
           {secondsLeft > 0 ? (
             <span className="font-medium text-text-primary">Resend in {secondsLeft}s</span>
           ) : (
-            <button
-              type="button"
-              onClick={handleResend}
-              className="cursor-pointer rounded-sm font-medium text-accent-lime underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-accent-pink"
-            >
+            <Button variant="link" hoverScale={1} onClick={handleResend} className="h-auto p-0 font-medium text-accent-lime">
               Resend code
-            </button>
+            </Button>
           )}
         </p>
         <p>
           Wrong email?{" "}
-          <Link
-            href="/register"
-            className="font-medium text-accent-lime underline-offset-4 hover:underline"
-          >
+          <Link href="/register" className="font-medium text-accent-lime underline-offset-4 hover:underline">
             Change it
           </Link>
         </p>
