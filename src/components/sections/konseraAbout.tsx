@@ -11,7 +11,7 @@ import {
   useAnimationFrame,
   useReducedMotion,
   type MotionValue,
-} from "framer-motion";
+} from "motion/react";
 import { Sparkle } from "lucide-react";
 
 /* ─── Velocity / Parallax text ──────────────────────────────── */

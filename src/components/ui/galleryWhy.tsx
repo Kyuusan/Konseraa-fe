@@ -7,7 +7,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-} from "framer-motion";
+} from "motion/react";
 
 const SECTION_HEIGHT = 1500;
 

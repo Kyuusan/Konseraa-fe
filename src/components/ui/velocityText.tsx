@@ -7,7 +7,7 @@ import {
   useMotionValue,
   useVelocity,
   useAnimationFrame
-} from "framer-motion";
+} from "motion/react";
 
 // Wrap function (replacement for @motionone/utils)
 const wrap = (min: number, max: number, v: number) => {

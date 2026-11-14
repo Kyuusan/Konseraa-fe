@@ -1,7 +1,7 @@
 "use client";
 
 import { GrainGradient } from "@paper-design/shaders-react";
-import { useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "motion/react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 

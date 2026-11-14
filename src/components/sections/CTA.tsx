@@ -6,7 +6,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-} from "framer-motion";
+} from "motion/react";
 
 export const CTA = () => {
   const sectionRef = useRef<HTMLElement>(null);

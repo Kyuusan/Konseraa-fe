@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { MapPin, Music } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

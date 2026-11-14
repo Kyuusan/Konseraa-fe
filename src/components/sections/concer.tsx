@@ -8,7 +8,7 @@ import {
   useReducedMotion,
   useScroll,
   useTransform,
-} from "framer-motion";
+} from "motion/react";
 import { Ticket } from "lucide-react";
 
 import { Button } from "@/components/ui/buttonAnimate";
