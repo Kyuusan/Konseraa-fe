@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* The app is dark-only, so shadcn / Animate UI `dark:` styles always apply. */
+@custom-variant dark (&);
 
 @theme inline {
   --color-bg-base: #0B0B0E;
@@ -9,6 +13,29 @@
   --color-accent-pink: #FF3DA6;
   --color-accent-lime: #C6FF3D;
   --color-border: rgba(245,243,239,0.08);
+
+  /* Status colours (not in design.md; approved for failed/warning states). */
+  --color-danger: #FF4D5E;
+  --color-warning: #FFB547;
+
+  /* shadcn / Animate UI semantic colours, mapped onto the Stagelight tokens above. */
+  --color-background: var(--color-bg-base);
+  --color-foreground: var(--color-text-primary);
+  --color-card: var(--color-bg-surface);
+  --color-card-foreground: var(--color-text-primary);
+  --color-popover: var(--color-bg-surface-2);
+  --color-popover-foreground: var(--color-text-primary);
+  --color-primary: var(--color-accent-lime);
+  --color-primary-foreground: var(--color-bg-base);
+  --color-secondary: var(--color-bg-surface-2);
+  --color-secondary-foreground: var(--color-text-primary);
+  --color-muted: var(--color-bg-surface);
+  --color-muted-foreground: var(--color-text-muted);
+  --color-accent: var(--color-bg-surface-2);
+  --color-accent-foreground: var(--color-text-primary);
+  --color-destructive: var(--color-danger);
+  --color-input: var(--color-border);
+  --color-ring: var(--color-accent-pink);
 
   --font-sans: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
@@ -45,6 +72,11 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/* Ticket-stub notch: the torn top-right corner shared by every ticket card. */
+@utility ticket-notch {
+  mask: radial-gradient(circle at 100% 0, transparent 18px, rgb(0 0 0) 18.5px);
 }
 
 /* Vertical marquee: the track holds its items repeated, so moving by half loops seamlessly. */
