@@ -1,0 +1,687 @@
+openapi: 3.0.3
+info:
+  title: Konsera API
+  description: REST API for the Konsera concert ticketing platform.
+  version: "1.0.0"
+  contact:
+    name: Konsera Engineering
+servers:
+  - url: https://api.konsera.id/api/v1
+    description: Production
+  - url: https://staging-api.konsera.id/api/v1
+    description: Staging
+
+tags:
+  - name: Auth
+  - name: User
+  - name: Event
+  - name: Booking
+  - name: Ticket
+  - name: CheckIn
+  - name: Admin
+
+# ---------------------------------------------------------------------------
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        message: { type: string }
+        data: { type: object }
+        meta:
+          type: object
+          properties:
+            page: { type: integer }
+            limit: { type: integer }
+            total: { type: integer }
+            total_pages: { type: integer }
+        errors:
+          type: object
+          nullable: true
+
+    Error:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        message: { type: string }
+        errors:
+          type: object
+          properties:
+            code: { type: string, example: "ERR_BOOKING_001" }
+            details: { type: string }
+
+    User:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string, format: email }
+        phone: { type: string }
+        status: { type: string, enum: [active, suspended, banned, pending_verification] }
+        full_name: { type: string }
+        avatar_url: { type: string }
+        created_at: { type: string, format: date-time }
+
+    Organizer:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        company_name: { type: string }
+        verification_status: { type: string, enum: [pending, in_review, approved, rejected] }
+
+    Venue:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        type: { type: string, enum: [indoor, outdoor, hybrid] }
+        city: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+        total_capacity: { type: integer }
+
+    TicketTier:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        tier_type: { type: string, enum: [early_bird, regular, vip, vvip, group_package] }
+        price: { type: number }
+        max_per_transaction: { type: integer }
+        available_quota: { type: integer }
+
+    Event:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        title: { type: string }
+        slug: { type: string }
+        description: { type: string }
+        poster_url: { type: string }
+        status: { type: string, enum: [draft, pending_review, approved, rejected, published, ongoing, completed, cancelled] }
+        min_price: { type: number }
+        max_price: { type: number }
+        venue: { $ref: '#/components/schemas/Venue' }
+        categories:
+          type: array
+          items: { type: string }
+
+    Booking:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        booking_code: { type: string }
+        status: { type: string, enum: [pending, awaiting_payment, paid, expired, cancelled, refunded, partially_refunded] }
+        subtotal_amount: { type: number }
+        discount_amount: { type: number }
+        platform_fee_amount: { type: number }
+        total_amount: { type: number }
+        hold_expires_at: { type: string, format: date-time }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/BookingItem' }
+
+    BookingItem:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        ticket_tier_id: { type: string, format: uuid }
+        quantity: { type: integer }
+        unit_price: { type: number }
+        line_total: { type: number }
+
+    Ticket:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        ticket_code: { type: string }
+        status: { type: string, enum: [issued, transferred, checked_in, expired, cancelled, void] }
+        qr_code_url: { type: string }
+        event_title: { type: string }
+        session_start_at: { type: string, format: date-time }
+
+    Payment:
+      type: object
+      properties:
+        id: { type: string, format: uuid }
+        booking_id: { type: string, format: uuid }
+        amount: { type: number }
+        status: { type: string, enum: [pending, processing, success, failed, expired, refunded, partially_refunded] }
+        payment_url: { type: string }
+        expires_at: { type: string, format: date-time }
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema: { type: integer, default: 1 }
+    LimitParam:
+      name: limit
+      in: query
+      schema: { type: integer, default: 10, maximum: 100 }
+
+security:
+  - bearerAuth: []
+
+# ---------------------------------------------------------------------------
+paths:
+  # ---------------- AUTH ----------------
+  /auth/register:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Register a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, full_name]
+              properties:
+                email: { type: string, format: email }
+                password: { type: string, format: password, minLength: 8 }
+                full_name: { type: string }
+                phone: { type: string }
+      responses:
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/ApiResponse' } } } }
+        '409': { description: Email already registered, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Login with email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email: { type: string }
+                password: { type: string }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/ApiResponse' } } } }
+        '401': { description: Invalid credentials (ERR_AUTH_001), content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      security: []
+      summary: Exchange refresh token for a new access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [refresh_token], properties: { refresh_token: { type: string } } }
+      responses:
+        '200': { description: OK }
+        '401': { description: Token expired (ERR_AUTH_002) }
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Revoke current refresh token
+      responses:
+        '200': { description: OK }
+
+  /auth/forgot-password:
+    post:
+      tags: [Auth]
+      security: []
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { email: { type: string } } } } }
+      responses:
+        '200': { description: Reset email sent }
+
+  /auth/reset-password:
+    post:
+      tags: [Auth]
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { token: { type: string }, new_password: { type: string } }
+      responses:
+        '200': { description: Password updated }
+
+  /auth/oauth/google:
+    post:
+      tags: [Auth]
+      security: []
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { id_token: { type: string } } } } }
+      responses:
+        '200': { description: OK }
+
+  /auth/oauth/apple:
+    post:
+      tags: [Auth]
+      security: []
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { identity_token: { type: string } } } } }
+      responses:
+        '200': { description: OK }
+
+  # ---------------- USER ----------------
+  /users/me:
+    get:
+      tags: [User]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { $ref: '#/components/schemas/User' } }
+    put:
+      tags: [User]
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/User' } } }
+      responses:
+        '200': { description: Updated }
+
+  /users/me/preferences:
+    get:
+      tags: [User]
+      responses:
+        '200': { description: OK }
+    put:
+      tags: [User]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                favorite_genres: { type: array, items: { type: string } }
+                notify_push: { type: boolean }
+                notify_email: { type: boolean }
+                notify_sms: { type: boolean }
+      responses:
+        '200': { description: Updated }
+
+  /users/me/bookings:
+    get:
+      tags: [User]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { type: array, items: { $ref: '#/components/schemas/Booking' } } }
+
+  /users/me/tickets:
+    get:
+      tags: [User]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { type: array, items: { $ref: '#/components/schemas/Ticket' } } }
+
+  # ---------------- EVENT ----------------
+  /events:
+    get:
+      tags: [Event]
+      security: []
+      summary: List / filter events
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: city
+          in: query
+          schema: { type: string }
+        - name: date_from
+          in: query
+          schema: { type: string, format: date }
+        - name: date_to
+          in: query
+          schema: { type: string, format: date }
+        - name: genre
+          in: query
+          schema: { type: string }
+        - name: price_min
+          in: query
+          schema: { type: number }
+        - name: price_max
+          in: query
+          schema: { type: number }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [newest, price_asc, price_desc, popularity] }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { type: array, items: { $ref: '#/components/schemas/Event' } } }
+    post:
+      tags: [Event]
+      summary: Create event (organizer only)
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/Event' } } }
+      responses:
+        '201': { description: Created }
+        '403': { description: Insufficient permission (ERR_PERM_001) }
+
+  /events/{id}:
+    get:
+      tags: [Event]
+      security: []
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { $ref: '#/components/schemas/Event' } }
+        '404': { description: Event not found (ERR_EVENT_001) }
+    put:
+      tags: [Event]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        content: { application/json: { schema: { $ref: '#/components/schemas/Event' } } }
+      responses:
+        '200': { description: Updated }
+    delete:
+      tags: [Event]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Soft-deleted }
+
+  /events/{id}/sessions:
+    get:
+      tags: [Event]
+      security: []
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  /events/{id}/ticket-tiers:
+    get:
+      tags: [Event]
+      security: []
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { type: array, items: { $ref: '#/components/schemas/TicketTier' } } }
+
+  /events/{id}/seat-map:
+    get:
+      tags: [Event]
+      security: []
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK, description2: Returns venue sections with real-time seat availability }
+
+  /events/featured:
+    get:
+      tags: [Event]
+      security: []
+      responses:
+        '200': { description: OK }
+
+  /events/search:
+    get:
+      tags: [Event]
+      security: []
+      summary: Full-text search (Elasticsearch-backed)
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+
+  # ---------------- BOOKING ----------------
+  /carts:
+    post:
+      tags: [Booking]
+      summary: Add item to cart (places a temporary hold on inventory/seat)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ticket_tier_id, event_session_id, quantity]
+              properties:
+                ticket_tier_id: { type: string, format: uuid }
+                event_session_id: { type: string, format: uuid }
+                seat_id: { type: string, format: uuid }
+                quantity: { type: integer }
+      responses:
+        '201': { description: Held }
+        '409': { description: Seat already taken (ERR_BOOKING_001) }
+    get:
+      tags: [Booking]
+      responses:
+        '200': { description: OK }
+
+  /carts/{item_id}:
+    delete:
+      tags: [Booking]
+      parameters: [{ name: item_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Removed / hold released }
+
+  /bookings:
+    post:
+      tags: [Booking]
+      summary: Checkout — convert cart items into a booking
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cart_item_ids: { type: array, items: { type: string, format: uuid } }
+                promo_code: { type: string }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { $ref: '#/components/schemas/Booking' } }
+        '410': { description: Hold expired (ERR_BOOKING_002) }
+
+  /bookings/{id}:
+    get:
+      tags: [Booking]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  /bookings/{id}/cancel:
+    post:
+      tags: [Booking]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: Cancelled }
+
+  /bookings/{id}/pay:
+    post:
+      tags: [Booking]
+      summary: Initiate payment for a booking
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { payment_method_id: { type: string, format: uuid } }
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - properties: { data: { $ref: '#/components/schemas/Payment' } }
+        '402': { description: Payment failed (ERR_PAYMENT_001) }
+
+  /bookings/{id}/payment-status:
+    get:
+      tags: [Booking]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  # ---------------- TICKET ----------------
+  /tickets:
+    get:
+      tags: [Ticket]
+      responses:
+        '200': { description: OK }
+
+  /tickets/{id}:
+    get:
+      tags: [Ticket]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  /tickets/{id}/transfer:
+    post:
+      tags: [Ticket]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { to_email: { type: string } } } } }
+      responses:
+        '200': { description: Transfer requested }
+        '423': { description: Transfer locked (H-1 before event) }
+
+  /tickets/{id}/qr-code:
+    get:
+      tags: [Ticket]
+      summary: Get current rotating QR payload (refreshes every 30s, expires in 5 min)
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  # ---------------- CHECK-IN ----------------
+  /check-ins:
+    post:
+      tags: [CheckIn]
+      summary: Scan a ticket QR code at the gate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [qr_token, event_session_id]
+              properties:
+                qr_token: { type: string }
+                event_session_id: { type: string, format: uuid }
+                device_id: { type: string }
+      responses:
+        '200': { description: Check-in result returned (success/duplicate/invalid/expired) }
+
+  /check-ins/stats/{event_id}:
+    get:
+      tags: [CheckIn]
+      parameters: [{ name: event_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  /check-ins/logs/{event_id}:
+    get:
+      tags: [CheckIn]
+      parameters: [{ name: event_id, in: path, required: true, schema: { type: string, format: uuid } }]
+      responses:
+        '200': { description: OK }
+
+  # ---------------- ADMIN ----------------
+  /admin/users:
+    get:
+      tags: [Admin]
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+      responses:
+        '200': { description: OK }
+
+  /admin/users/{id}/status:
+    put:
+      tags: [Admin]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        content: { application/json: { schema: { type: object, properties: { status: { type: string } } } } }
+      responses:
+        '200': { description: Updated }
+
+  /admin/events/pending:
+    get:
+      tags: [Admin]
+      responses:
+        '200': { description: OK }
+
+  /admin/events/{id}/approve:
+    put:
+      tags: [Admin]
+      parameters: [{ name: id, in: path, required: true, schema: { type: string, format: uuid } }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { approved: { type: boolean }, rejection_reason: { type: string } }
+      responses:
+        '200': { description: Updated }
+
+  /admin/financials:
+    get:
+      tags: [Admin]
+      responses:
+        '200': { description: OK }
+
+  /admin/payouts:
+    post:
+      tags: [Admin]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: { organizer_id: { type: string, format: uuid }, event_id: { type: string, format: uuid } }
+      responses:
+        '201': { description: Payout scheduled }
