@@ -1,15 +1,8 @@
+import { TIER_TYPE_LABELS } from "@/lib/constants";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { TicketTier } from "@/types/event";
 import { QuantityStepper } from "../shared/quantityStepper";
-
-const TIER_TYPE_LABELS: Record<TicketTier["tier_type"], string> = {
-  early_bird: "Early bird",
-  regular: "Regular",
-  vip: "VIP",
-  vvip: "VVIP",
-  group_package: "Group package",
-};
 
 /** Below this, the remaining quota is shown so buyers know it is running out. */
 const LOW_QUOTA = 50;

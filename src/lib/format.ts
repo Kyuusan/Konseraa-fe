@@ -21,3 +21,21 @@ export function formatDate(iso: string, timeZone: string) {
 export function formatTime(iso: string, timeZone: string) {
   return formatDateTime(iso, timeZone, { hour: "numeric", minute: "2-digit", timeZoneName: "short" });
 }
+
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+export function formatNumber(value: number) {
+  return numberFormatter.format(value);
+}
+
+const compactPriceFormatter = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  notation: "compact",
+  maximumFractionDigits: 1,
+});
+
+/** Short price for chart labels, e.g. $161.8K. */
+export function formatPriceCompact(amount: number) {
+  return compactPriceFormatter.format(amount);
+}

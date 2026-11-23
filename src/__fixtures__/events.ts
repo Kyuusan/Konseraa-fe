@@ -44,13 +44,13 @@ const RAW_EVENTS = [
     id: fixtureId(1), slug: "neon-arcadia-world-tour", title: "Neon Arcadia World Tour",
     description: "The Midnight Static bring their synth-heavy live show to Jakarta for one night, with a reworked setlist built around the new record.",
     status: "published", min_price: 65, max_price: 120, venue: VENUES.istora, categories: ["Pop", "Electronic"],
-    starts_at: "2026-12-12T20:00:00+07:00", ...art(PHOTOS.lights),
+    starts_at: "2026-12-12T20:00:00+07:00", ...art(PHOTOS.lights), seat_map_url: "/seat-maps/neon-arcadia-world-tour.svg",
   },
   {
     id: fixtureId(2), slug: "gelora-fest-2026", title: "Gelora Fest 2026",
     description: "Two days of local indie and rock across one open-air stage. Each day has its own line-up and its own tickets.",
     status: "published", min_price: 30, max_price: 100, venue: VENUES.saparua, categories: ["Indie", "Rock"],
-    starts_at: "2026-12-19T15:00:00+07:00", ...art(PHOTOS.festival),
+    starts_at: "2026-12-19T15:00:00+07:00", ...art(PHOTOS.festival), seat_map_url: "/seat-maps/gelora-fest-2026.svg",
   },
   {
     id: fixtureId(3), slug: "low-tide-sessions", title: "Low Tide Sessions",

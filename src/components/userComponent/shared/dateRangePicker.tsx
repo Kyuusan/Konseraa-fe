@@ -19,14 +19,15 @@ interface DateRangePickerProps {
   from: string;
   to: string;
   onChange: (range: { from: string; to: string }) => void;
+  placeholder?: string;
 }
 
-export function DateRangePicker({ id, from, to, onChange }: DateRangePickerProps) {
+export function DateRangePicker({ id, from, to, onChange, placeholder = "Any date" }: DateRangePickerProps) {
   const start = toDate(from);
   const end = toDate(to);
   const label = start
     ? `${labelFormatter.format(start)}${end ? ` – ${labelFormatter.format(end)}` : ""}`
-    : "Any date";
+    : placeholder;
 
   return (
     <Popover>

@@ -12,14 +12,14 @@ import {
   type PaymentMethod,
 } from "@/types/booking";
 import type { TicketTier } from "@/types/event";
+import { UNPAID_ORDER_EXPIRY_MINUTES } from "@/lib/constants";
 import { fixtureId } from "./ids";
 
 /** PRD §9.1: holds last 10 minutes; the real value comes from server config. */
 const HOLD_MINUTES = 10;
 /** Stands in for commission_settings. */
 const PLATFORM_FEE_RATE = 0.05;
-/** PRD §9.2 sets 24h for virtual accounts and 15 min for e-wallets; the rest are assumed 15 min. */
-const PAYMENT_WINDOW_MINUTES = { virtual_account: 24 * 60, ewallet: 15, credit_card: 15, qris: 15, paylater: 15 };
+
 
 const PROMOS: Record<string, { type: "percentage" | "fixed"; value: number }> = {
   KONSERA10: { type: "percentage", value: 10 },
@@ -96,7 +96,8 @@ export function createPayment(booking: Booking, method: PaymentMethod, startedAt
     amount: booking.total_amount,
     status: "pending",
     payment_url: `https://pay.example.com/${booking.booking_code}`,
-    expires_at: addMinutes(startedAt, PAYMENT_WINDOW_MINUTES[method.category]),
+    // Same window for every method (agreed rule), so `method` only shapes the instructions.
+    expires_at: addMinutes(startedAt, UNPAID_ORDER_EXPIRY_MINUTES),
     va_number: method.category === "virtual_account" ? `8808${booking.booking_code.replace(/\D/g, "").padEnd(12, "0")}` : null,
     qr_string: method.category === "qris" ? `00020101021226KONSERA${booking.booking_code}` : null,
   });

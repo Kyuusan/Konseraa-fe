@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OrderRefundSchema } from "./refund";
 
 // Shapes follow openapi-spec.yaml. Fields marked "not in spec" are needed by the
 // PRD checkout/payment screens (§13.4–13.5); confirm with backend.
@@ -99,3 +100,27 @@ export const PaymentSchema = z.object({
   qr_string: z.string().nullable(),
 });
 export type Payment = z.infer<typeof PaymentSchema>;
+
+/**
+ * Not in spec beyond Booking: one row of GET /users/me/bookings as the order
+ * history needs it (event, session and payment details joined in).
+ */
+export const UserOrderSchema = BookingSchema.extend({
+  event_slug: z.string(),
+  event_title: z.string(),
+  poster_url: z.url(),
+  session_name: z.string(),
+  session_start_at: IsoDateTime,
+  venue_name: z.string(),
+  venue_timezone: z.string(),
+  ticket_count: z.int().positive(),
+  payment_method_name: z.string().nullable(),
+  created_at: IsoDateTime,
+  paid_at: IsoDateTime.nullable(),
+  /** Deadline of the open payment, for awaiting_payment orders. */
+  payment_expires_at: IsoDateTime.nullable(),
+  refunded_amount: z.number().nonnegative().nullable(),
+  /** Not in spec: refund state for paid orders (null otherwise). */
+  refund: OrderRefundSchema.nullable(),
+});
+export type UserOrder = z.infer<typeof UserOrderSchema>;

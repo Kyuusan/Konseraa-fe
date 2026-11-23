@@ -31,6 +31,17 @@ export const TICKETS: Ticket[] = TicketSchema.array().parse([
     session_name: "Main show", session_start_at: "2026-10-17T19:00:00+07:00", tier_name: "Regular",
     venue_name: "Istora Senayan", venue_timezone: "Asia/Jakarta",
   }),
+  // Order KNS-261105-733: one ticket kept, one sent to a friend.
+  ticket(7, {
+    ticket_code: "KNS-BA-22017", status: "issued", event_title: "Bass Assembly NYE", event_slug: "bass-assembly-nye",
+    session_name: "NYE night", session_start_at: "2026-12-31T20:00:00+08:00", tier_name: "General",
+    venue_name: "Garuda Wisnu Park", venue_timezone: "Asia/Makassar",
+  }),
+  ticket(8, {
+    ticket_code: "KNS-BA-22018", status: "transferred", event_title: "Bass Assembly NYE", event_slug: "bass-assembly-nye",
+    session_name: "NYE night", session_start_at: "2026-12-31T20:00:00+08:00", tier_name: "General",
+    venue_name: "Garuda Wisnu Park", venue_timezone: "Asia/Makassar",
+  }),
 ]);
 
 export const getTicket = (id: string) => TICKETS.find((item) => item.id === id);

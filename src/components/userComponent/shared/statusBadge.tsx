@@ -2,9 +2,22 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { BookingStatus, PaymentStatus } from "@/types/booking";
 import type { EVENT_STATUSES } from "@/types/event";
+import type { CheckInResult, Gatekeeper } from "@/types/gatekeeper";
+import type { OrganizerVerificationStatus } from "@/types/organizer";
+import type { PromoStatus } from "@/types/promo";
+import type { RefundRequestStatus } from "@/types/refund";
 import type { TicketStatus } from "@/types/ticket";
 
-type Status = BookingStatus | PaymentStatus | TicketStatus | (typeof EVENT_STATUSES)[number];
+type Status =
+  | BookingStatus
+  | PaymentStatus
+  | TicketStatus
+  | OrganizerVerificationStatus
+  | PromoStatus
+  | RefundRequestStatus
+  | CheckInResult
+  | Gatekeeper["status"]
+  | (typeof EVENT_STATUSES)[number];
 
 // lime = done/active, pink = waiting on someone, muted = finished/neutral,
 // danger = failed/refused, warning = timed out.
@@ -24,16 +37,25 @@ const STATUS_TONE: Record<Status, keyof typeof TONES> = {
   published: "positive",
   approved: "positive",
   ongoing: "positive",
+  active: "positive",
   pending: "attention",
   awaiting_payment: "attention",
   processing: "attention",
   pending_review: "attention",
+  in_review: "attention",
+  scheduled: "attention",
+  requested: "attention",
   draft: "neutral",
   completed: "neutral",
   transferred: "neutral",
   refunded: "neutral",
   partially_refunded: "neutral",
+  used_up: "neutral",
+  disabled: "neutral",
+  inactive: "neutral",
   expired: "warning",
+  duplicate: "warning",
+  invalid: "danger",
   failed: "danger",
   cancelled: "danger",
   rejected: "danger",

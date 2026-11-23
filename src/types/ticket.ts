@@ -35,3 +35,9 @@ export const TicketSchema = z.object({
   holder_name: z.string(),
 });
 export type Ticket = z.infer<typeof TicketSchema>;
+
+/** Body of POST /tickets/{id}/transfer (in spec). */
+export const TicketTransferSchema = z.object({
+  to_email: z.email("Enter the email of the person you're sending it to."),
+});
+export type TicketTransfer = z.infer<typeof TicketTransferSchema>;

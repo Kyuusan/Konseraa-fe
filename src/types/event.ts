@@ -46,6 +46,8 @@ export const ConcertEventSchema = z.object({
   banner_url: z.url(),
   /** Not in spec: first session start, for cards and the date filter. */
   starts_at: IsoDateTime,
+  /** Not in spec: seat map / venue layout image uploaded by the organizer (optional). */
+  seat_map_url: z.string().nullable().default(null),
 });
 export type ConcertEvent = z.infer<typeof ConcertEventSchema>;
 
@@ -88,6 +90,25 @@ export const ReviewSchema = z.object({
   created_at: IsoDateTime,
 });
 export type Review = z.infer<typeof ReviewSchema>;
+
+/** Not in spec (no review endpoint yet): what an attendee submits. */
+export const ReviewFormSchema = z.object({
+  rating: z.int().min(1, "Pick a rating from 1 to 5.").max(5),
+  comment: z
+    .string()
+    .trim()
+    .min(20, "Tell other fans a bit more (at least 20 characters).")
+    .max(1000, "Keep it under 1000 characters."),
+});
+export type ReviewForm = z.infer<typeof ReviewFormSchema>;
+
+/** Not in spec: reviews of an earlier edition or tour stop, shown before this show has happened. */
+export const PastShowReviewsSchema = z.object({
+  show_title: z.string(),
+  show_date: IsoDateTime,
+  reviews: z.array(ReviewSchema),
+});
+export type PastShowReviews = z.infer<typeof PastShowReviewsSchema>;
 
 export const EVENT_SORTS = ["newest", "price_asc", "price_desc", "popularity"] as const;
 export type EventSort = (typeof EVENT_SORTS)[number];

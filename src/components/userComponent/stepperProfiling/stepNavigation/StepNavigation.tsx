@@ -7,6 +7,8 @@ interface StepNavigationProps {
   canContinue: boolean;
   onBack: () => void;
   onNext: () => void;
+  /** Label of the last step's button. */
+  finishLabel?: string;
 }
 
 export function StepNavigation({
@@ -15,6 +17,7 @@ export function StepNavigation({
   canContinue,
   onBack,
   onNext,
+  finishLabel = "Finish",
 }: StepNavigationProps) {
   const isLast = activeStep === totalSteps - 1;
 
@@ -28,7 +31,7 @@ export function StepNavigation({
         Step {activeStep + 1} of {totalSteps}
       </p>
       <Button hoverScale={1.02} onClick={onNext} disabled={!canContinue} className="h-11 rounded-full px-5 font-semibold">
-        {isLast ? "Finish" : "Continue"}
+        {isLast ? finishLabel : "Continue"}
         <ChevronRight aria-hidden="true" />
       </Button>
     </div>
