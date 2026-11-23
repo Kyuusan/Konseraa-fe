@@ -1,6 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type { SubmitEvent } from "react";
+import { clearDemoCookie, DEMO_GATEKEEPER_COOKIE, writeDemoCookie } from "@/__fixtures__/demoState";
+import { findGatekeeperByEmail } from "@/__fixtures__/gatekeepers";
 import {
   AuthHeading,
   CheckboxLine,
@@ -12,13 +16,31 @@ import {
 } from "./authUi";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  // Demo only: one login for every role. The real API returns the roles; here a
+  // gatekeeper fixture email opens the gate area and anything else the customer app.
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const identifier = String(new FormData(event.currentTarget).get("identifier") ?? "");
+    const gatekeeper = findGatekeeperByEmail(identifier);
+    if (gatekeeper?.status === "active") {
+      writeDemoCookie(DEMO_GATEKEEPER_COOKIE, gatekeeper.id);
+      router.push("/gate");
+    } else {
+      clearDemoCookie(DEMO_GATEKEEPER_COOKIE);
+      router.push("/home");
+    }
+    router.refresh();
+  }
+
   return (
     <>
       <AuthHeading title="Welcome back" subtitle="Your next show is waiting" />
       <SocialButtons />
       <OrDivider />
 
-      <form onSubmit={(event) => event.preventDefault()} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <FieldBox
           name="identifier"
           label="Email or phone"
@@ -33,7 +55,12 @@ export default function LoginPage() {
           autoComplete="current-password"
           required
         />
-        <CheckboxLine name="remember">Remember me</CheckboxLine>
+        <div className="flex items-center justify-between gap-3">
+          <CheckboxLine name="remember">Remember me</CheckboxLine>
+          <Link href="/forgot-password" className="shrink-0 text-sm font-medium text-accent-lime underline-offset-4 hover:underline">
+            Forgot password?
+          </Link>
+        </div>
         <SubmitButton>Sign in</SubmitButton>
       </form>
 
