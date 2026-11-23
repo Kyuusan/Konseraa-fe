@@ -11,6 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/animate-ui/components/radix/sheet";
+import { getUnreadCount } from "@/__fixtures__/notifications";
 import { BrandLogo } from "../shared/brandLogo";
 import { ADMIN_FOOTER_NAV, ADMIN_NAV, type NavItem } from "../shared/navigation";
 import { ProfileMenu, type ProfileLink } from "../shared/profileMenu";
@@ -61,7 +62,7 @@ export function AdminHeadbar() {
           <BrandLogo href="/admin/dashboard" tag="Admin" />
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <HeadbarActions />
+          <HeadbarActions notificationsHref="/admin/notifications" unread={getUnreadCount("admin")} />
           <ProfileMenu name="Super Admin" email="superadmin@konsera.test" links={PROFILE_LINKS} />
         </div>
       </div>

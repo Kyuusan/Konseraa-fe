@@ -1,7 +1,12 @@
+import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { getCurrentGatekeeper } from "@/__fixtures__/session";
 import { UserHeadbar } from "@/components/layout/headbar/userHeadbar";
 
-export default function MainLayout({ children }: { children: ReactNode }) {
+export default async function MainLayout({ children }: { children: ReactNode }) {
+  // Gatekeeper accounts only get the gate pages (agreed scope).
+  if (await getCurrentGatekeeper()) redirect("/gate");
+
   return (
     <div className="min-h-screen bg-bg-base text-text-primary">
       <UserHeadbar />

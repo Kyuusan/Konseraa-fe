@@ -1,6 +1,7 @@
 "use client";
 
-import { LogOut, Settings, User } from "lucide-react";
+import { LogOut, Receipt, User } from "lucide-react";
+import { getUnreadCount } from "@/__fixtures__/notifications";
 import { BrandLogo } from "../shared/brandLogo";
 import { USER_NAV } from "../shared/navigation";
 import { ProfileMenu, type ProfileLink } from "../shared/profileMenu";
@@ -11,7 +12,7 @@ import { UserBottomNav } from "./userBottomNav";
 
 const PROFILE_LINKS: ProfileLink[] = [
   { label: "Profile", href: "/profile", icon: User },
-  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "My orders", href: "/orders", icon: Receipt },
   { label: "Log out", href: "/login", icon: LogOut },
 ];
 
@@ -27,7 +28,7 @@ export function UserHeadbar() {
             <NavPills items={USER_NAV} />
           </div>
           <div className="col-start-3 flex items-center gap-2 justify-self-end">
-            <HeadbarActions />
+            <HeadbarActions notificationsHref="/notifications" unread={getUnreadCount("customer")} />
             <ProfileMenu name="Demo User" email="user@konsera.test" links={PROFILE_LINKS} />
           </div>
         </div>
