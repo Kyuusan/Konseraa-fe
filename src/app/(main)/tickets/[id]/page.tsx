@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getCurrentSession } from "@/__fixtures__/session";
 import { getTicket, getTicketQrToken } from "@/__fixtures__/tickets";
 import { ETicketView } from "@/components/userComponent/eTicket/eTicketView";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
@@ -8,6 +9,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
   const { id } = await params;
   const ticket = getTicket(id);
   if (!ticket) notFound();
+  const { user } = await getCurrentSession();
 
   return (
     <div className="space-y-8">
@@ -18,7 +20,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <ButtonLink href="/tickets" variant="outline" hoverScale={1} className="rounded-full">All tickets</ButtonLink>
         }
       />
-      <ETicketView ticket={ticket} qrToken={getTicketQrToken(ticket)} />
+      <ETicketView ticket={ticket} qrToken={getTicketQrToken(ticket)} ownerEmail={user.email} />
     </div>
   );
 }

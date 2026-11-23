@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { Progress } from "@/components/animate-ui/components/radix/progress";
@@ -9,7 +10,9 @@ import { formatDate, formatDateTime, formatTime } from "@/lib/format";
 import type { Ticket } from "@/types/ticket";
 import { Perforation } from "../shared/perforation";
 import { StatusBadge } from "../shared/statusBadge";
+import { ButtonLink } from "../shared/buttonLink";
 import { TicketCard } from "../shared/ticketCard";
+import { TransferDialog } from "./transferDialog";
 
 const HOUR_MS = 60 * 60 * 1000;
 
@@ -27,10 +30,13 @@ function Watermark({ text }: { text: string }) {
   );
 }
 
-export function ETicketView({ ticket, qrToken }: { ticket: Ticket; qrToken: string }) {
+export function ETicketView({ ticket, qrToken, ownerEmail }: { ticket: Ticket; qrToken: string; ownerEmail: string }) {
   const now = useNow();
+  // Set after a transfer in this visit; the API would return the ticket as "transferred".
+  const [transferredTo, setTransferredTo] = useState<string | null>(null);
+  const status = transferredTo ? "transferred" : ticket.status;
   const timeZone = ticket.venue_timezone;
-  const usable = ticket.status === "issued";
+  const usable = status === "issued";
   const elapsed = now === null ? 0 : Math.floor(now / 1000) % QR_REFRESH_SECONDS;
   const transferLocked =
     now !== null && new Date(ticket.session_start_at).getTime() - now < TRANSFER_LOCK_HOURS * HOUR_MS;
@@ -66,7 +72,23 @@ export function ETicketView({ ticket, qrToken }: { ticket: Ticket; qrToken: stri
           </div>
         ) : (
           <p className="relative py-10 text-center text-sm text-text-muted">
-            {ticket.status === "checked_in" ? "This ticket has been used to enter." : "This ticket can no longer be used."}
+            {transferredTo ? (
+              <>
+                Sent to <span className="font-semibold text-text-primary">{transferredTo}</span>. It is in their account now,
+                and this QR code no longer works.
+              </>
+            ) : status === "checked_in" ? (
+              <span className="flex flex-col items-center gap-4">
+                This ticket has been used to enter.
+                <ButtonLink href={`/events/${ticket.event_slug}?tab=reviews`} variant="outline" className="rounded-full">
+                  Rate this show
+                </ButtonLink>
+              </span>
+            ) : status === "transferred" ? (
+              "You transferred this ticket to someone else."
+            ) : (
+              "This ticket can no longer be used."
+            )}
           </p>
         )}
       </div>
@@ -89,20 +111,24 @@ export function ETicketView({ ticket, qrToken }: { ticket: Ticket; qrToken: stri
         <div>
           <dt className="text-xs font-semibold tracking-widest text-text-muted uppercase">Status</dt>
           <dd className="mt-1">
-            <StatusBadge status={ticket.status} />
+            <StatusBadge status={status} />
           </dd>
         </div>
       </dl>
 
       {usable && (
         <div className="space-y-2 px-6 pb-6">
-          <Button variant="outline" disabled className="h-11 w-full rounded-full">
-            Transfer ticket
-          </Button>
+          {transferLocked ? (
+            <Button variant="outline" disabled className="h-11 w-full rounded-full">
+              Transfer ticket
+            </Button>
+          ) : (
+            <TransferDialog ticket={ticket} ownerEmail={ownerEmail} onTransferred={setTransferredTo} />
+          )}
           <p className="text-center text-xs text-text-muted">
             {transferLocked
               ? `Transfers are locked from ${TRANSFER_LOCK_HOURS} hours before the show.`
-              : "Ticket transfer becomes available once the backend is connected."}
+              : `Can't go? Send it to a friend until ${TRANSFER_LOCK_HOURS} hours before the show.`}
           </p>
         </div>
       )}
