@@ -1,33 +1,108 @@
 "use client";
 
-import Link from "next/link";
+import { LoaderCircle, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { useRemaining } from "@/hooks/use-now";
+import { UNPAID_ORDER_EXPIRY_MINUTES } from "@/lib/constants";
 import type { Payment, PaymentMethod } from "@/types/booking";
+import { CancelOrderDialog } from "../orders/cancelOrderDialog";
+import { ButtonLink } from "../shared/buttonLink";
 import { Countdown } from "../shared/countdown";
 import { EmptyState } from "../shared/emptyState";
 import { VaInstructions } from "./vaInstructions";
 
+/** How often GET /bookings/{id}/payment-status is asked (PRD §13.5: automatic polling). */
+const POLL_MS = 5000;
+/** Pause on the "received" message before opening the success page. */
+const REDIRECT_MS = 1500;
+
+const clock = new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" });
+
 interface PaymentInstructionsProps {
+  bookingCode: string;
   payment: Payment;
   method: PaymentMethod;
   retryHref: string;
   successHref: string;
 }
 
-export function PaymentInstructions({ payment, method, retryHref, successHref }: PaymentInstructionsProps) {
+export function PaymentInstructions({ bookingCode, payment, method, retryHref, successHref }: PaymentInstructionsProps) {
+  const router = useRouter();
   const remaining = useRemaining(payment.expires_at);
+  const [status, setStatus] = useState<"pending" | "success" | "cancelled">("pending");
+  const [checking, setChecking] = useState(false);
+  const [lastChecked, setLastChecked] = useState<number | null>(null);
+  const [simulated, setSimulated] = useState(false);
+  // Demo only: what the payment provider's webhook would have recorded on the server.
+  const paidRef = useRef(false);
 
-  if (remaining === 0) {
+  // Stands in for GET /bookings/{id}/payment-status.
+  const checkStatus = useCallback(() => {
+    setChecking(true);
+    setTimeout(() => {
+      setLastChecked(Date.now());
+      setChecking(false);
+      if (paidRef.current) setStatus("success");
+    }, 600);
+  }, []);
+
+  const expired = remaining === 0;
+
+  useEffect(() => {
+    if (status !== "pending" || expired) return;
+    const timer = setInterval(checkStatus, POLL_MS);
+    return () => clearInterval(timer);
+  }, [checkStatus, status, expired]);
+
+  useEffect(() => {
+    if (status !== "success") return;
+    const timer = setTimeout(() => router.push(successHref), REDIRECT_MS);
+    return () => clearTimeout(timer);
+  }, [status, router, successHref]);
+
+  if (status === "cancelled") {
     return (
       <EmptyState
-        title="The payment window has closed"
-        description="This booking expired before it was paid, so the tickets were released."
+        title="Order cancelled"
+        description="The tickets held for you were released. Don't pay with the old payment code."
         action={
-          <Button asChild hoverScale={1} className="rounded-full">
-            <Link href={retryHref}>Choose tickets again</Link>
-          </Button>
+          <div className="flex flex-wrap justify-center gap-2">
+            <ButtonLink href="/orders" variant="outline" className="rounded-full">
+              My orders
+            </ButtonLink>
+            <ButtonLink href={retryHref} className="rounded-full">
+              Choose tickets again
+            </ButtonLink>
+          </div>
+        }
+      />
+    );
+  }
+
+  if (status === "success") {
+    return (
+      <div role="status" className="space-y-3 rounded-[20px] bg-accent-lime p-6 text-bg-base">
+        <p className="font-heading text-3xl font-bold">Payment received</p>
+        <p className="flex items-center gap-2 font-medium">
+          <LoaderCircle className="size-4 motion-safe:animate-spin" aria-hidden="true" />
+          Opening your booking…
+        </p>
+      </div>
+    );
+  }
+
+  if (expired) {
+    return (
+      <EmptyState
+        title="This order has expired"
+        description={`It wasn't paid within ${UNPAID_ORDER_EXPIRY_MINUTES / 60} hour, so it was cancelled automatically and the tickets were released.`}
+        action={
+          <ButtonLink href={retryHref} className="rounded-full">
+            Choose tickets again
+          </ButtonLink>
         }
       />
     );
@@ -35,14 +110,35 @@ export function PaymentInstructions({ payment, method, retryHref, successHref }:
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-bg-surface px-5 py-4 text-sm">
-        <span className="flex items-center gap-2">
-          <span aria-hidden="true" className="size-2 rounded-full bg-accent-pink motion-safe:animate-pulse" />
-          Waiting for payment
-        </span>
-        <span className="text-text-muted">
-          Pay within <Countdown until={payment.expires_at} />
-        </span>
+      <div className="space-y-2 rounded-2xl bg-bg-surface px-5 py-4 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="flex items-center gap-2 font-semibold" aria-live="polite">
+            {checking ? (
+              <>
+                <LoaderCircle className="size-4 text-accent-pink motion-safe:animate-spin" aria-hidden="true" />
+                Checking payment…
+              </>
+            ) : (
+              <>
+                <span aria-hidden="true" className="size-2 rounded-full bg-accent-pink motion-safe:animate-pulse" />
+                Waiting for payment
+              </>
+            )}
+          </span>
+          <span className="text-text-primary/70">
+            Pay within <Countdown until={payment.expires_at} />
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-text-primary/70">
+          <span>
+            We check every {POLL_MS / 1000} seconds and move on as soon as it arrives
+            {lastChecked !== null && ` · last checked ${clock.format(lastChecked)}`}.
+          </span>
+          <Button variant="ghost" size="sm" hoverScale={1} onClick={checkStatus} disabled={checking} className="h-8 rounded-full">
+            <RefreshCw aria-hidden="true" />
+            Check now
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-[20px] bg-bg-surface p-6">
@@ -70,15 +166,35 @@ export function PaymentInstructions({ payment, method, retryHref, successHref }:
         )}
       </div>
 
-      <p className="text-sm text-text-muted">Once the payment is confirmed, your e-tickets appear under Tickets.</p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-text-muted">
+          Orders not paid within {UNPAID_ORDER_EXPIRY_MINUTES / 60} hour expire automatically. Once the payment is confirmed,
+          your e-tickets appear under Tickets.
+        </p>
+        <CancelOrderDialog bookingCode={bookingCode} onCancelled={() => setStatus("cancelled")} />
+      </div>
 
       {process.env.NODE_ENV !== "production" && (
-        <p className="text-sm">
-          <Link href={successHref} className="font-medium text-accent-lime underline-offset-4 hover:underline">
-            Simulate a confirmed payment
-          </Link>{" "}
-          <span className="text-text-muted">(development only, until the payment webhook exists)</span>
-        </p>
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-dashed border-warning/50 px-4 py-3 text-sm">
+          <Button
+            variant="outline"
+            size="sm"
+            hoverScale={1}
+            disabled={simulated}
+            onClick={() => {
+              paidRef.current = true;
+              setSimulated(true);
+            }}
+            className="rounded-full"
+          >
+            Simulate payment received
+          </Button>
+          <span className="text-text-muted">
+            {simulated
+              ? "Done. The next automatic check picks it up."
+              : "Development only, stands in for the payment provider's webhook."}
+          </span>
+        </div>
       )}
     </div>
   );

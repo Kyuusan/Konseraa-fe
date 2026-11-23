@@ -21,6 +21,7 @@ export default async function Page({ params, searchParams }: PageProps) {
       <PageHeader eyebrow="Payment" title={`Pay with ${method.name}`} />
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <PaymentInstructions
+          bookingCode={booking.booking_code}
           payment={payment}
           method={method}
           retryHref={`/events/${event.slug}/tickets?session=${session.id}`}
