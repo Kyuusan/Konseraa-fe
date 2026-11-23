@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
 import { holdExpiry } from "@/__fixtures__/checkout";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { MAX_TICKETS_PER_TRANSACTION } from "@/lib/constants";
 import type { TicketTier } from "@/types/event";
+import { cn } from "@/lib/utils";
 import { toCheckoutQuery } from "../checkout/checkoutParams";
 import { TierCard } from "./tierCard";
 
@@ -13,9 +14,11 @@ interface TierSelectorProps {
   eventSlug: string;
   sessionId: string;
   tiers: TicketTier[];
+  /** Shown above the tiers, so buyers can match tiers to areas. */
+  seatMap?: ReactNode;
 }
 
-export function TierSelector({ eventSlug, sessionId, tiers }: TierSelectorProps) {
+export function TierSelector({ eventSlug, sessionId, tiers, seatMap }: TierSelectorProps) {
   const router = useRouter();
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const total = Object.values(quantities).reduce((sum, quantity) => sum + quantity, 0);
@@ -32,20 +35,24 @@ export function TierSelector({ eventSlug, sessionId, tiers }: TierSelectorProps)
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
-      <ul className="space-y-3">
-        {tiers.map((tier) => {
-          const quantity = quantities[tier.id] ?? 0;
-          return (
-            <TierCard
-              key={tier.id}
-              tier={tier}
-              quantity={quantity}
-              max={Math.min(tier.max_per_transaction, tier.available_quota, quantity + remaining)}
-              onChange={(value) => setQuantities((current) => ({ ...current, [tier.id]: value }))}
-            />
-          );
-        })}
-      </ul>
+      {/* With a seat map, map and tiers sit side by side (stacked on smaller screens). */}
+      <div className={cn("min-w-0", seatMap ? "grid gap-6 xl:grid-cols-2 xl:items-start" : undefined)}>
+        {seatMap && <div className="min-w-0 xl:sticky xl:top-28">{seatMap}</div>}
+        <ul className="min-w-0 space-y-3">
+          {tiers.map((tier) => {
+            const quantity = quantities[tier.id] ?? 0;
+            return (
+              <TierCard
+                key={tier.id}
+                tier={tier}
+                quantity={quantity}
+                max={Math.min(tier.max_per_transaction, tier.available_quota, quantity + remaining)}
+                onChange={(value) => setQuantities((current) => ({ ...current, [tier.id]: value }))}
+              />
+            );
+          })}
+        </ul>
+      </div>
 
       <aside aria-label="Your selection">
         <div className="space-y-4 rounded-[20px] bg-bg-surface p-5 lg:sticky lg:top-28">

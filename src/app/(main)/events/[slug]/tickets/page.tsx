@@ -3,6 +3,7 @@ import { getEventBySlug, getEventSessions, getEventTicketTiers } from "@/__fixtu
 import { param } from "@/components/userComponent/checkout/checkoutParams";
 import { EmptyState } from "@/components/userComponent/shared/emptyState";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
+import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
 import { TierSelector } from "@/components/userComponent/ticketSelection/tierSelector";
 import { formatDate, formatTime } from "@/lib/format";
 import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
@@ -39,7 +40,21 @@ export default async function Page({ params, searchParams }: PageProps) {
         actions={backLink}
       />
       {event.status === "published" && session ? (
-        <TierSelector eventSlug={event.slug} sessionId={session.id} tiers={getEventTicketTiers(event.id)} />
+        <TierSelector
+          eventSlug={event.slug}
+          sessionId={session.id}
+          tiers={getEventTicketTiers(event.id)}
+          seatMap={
+            event.seat_map_url && (
+              <SeatMapPreview
+                variant="inline"
+                src={event.seat_map_url}
+                eventTitle={event.title}
+                description="Match each tier below to its area. Not to scale."
+              />
+            )
+          }
+        />
       ) : (
         <EmptyState
           title="Ticket sales are closed"
