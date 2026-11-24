@@ -12,7 +12,7 @@ const eventId = (slug: string) => {
 
 export const PROMOS: Promo[] = PromoSchema.array().parse([
   {
-    id: fixtureId(1601), code: "NEON15", discount_type: "percentage", discount_value: 15, event_id: eventId("neon-arcadia-world-tour"),
+    id: fixtureId(1601), code: "NEON15", discount_type: "percentage", discount_value: 15, max_discount_amount: 20, event_id: eventId("neon-arcadia-world-tour"),
     usage_limit: 300, per_user_limit: 1, used_count: 184, starts_at: "2026-11-01T00:00:00+07:00", ends_at: "2026-12-05T23:59:00+07:00",
     is_active: true, status: "active",
   },

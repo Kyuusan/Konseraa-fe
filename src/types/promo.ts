@@ -18,6 +18,8 @@ export const PromoSchema = z.object({
   discount_type: z.enum(DISCOUNT_TYPES),
   /** Percent (1–100) or an amount in USD. */
   discount_value: z.number().positive(),
+  /** promo_codes.max_discount_amount (backend models): cap, in USD, for a percentage discount. */
+  max_discount_amount: z.number().positive().nullable().default(null),
   /** null: valid for every event of the organizer. */
   event_id: z.uuid().nullable(),
   usage_limit: z.int().positive(),
@@ -41,6 +43,8 @@ export const PromoFormSchema = z
       .regex(PROMO_CODE_PATTERN, "Use 4 to 16 letters or numbers, no spaces."),
     discount_type: z.enum(DISCOUNT_TYPES),
     discount_value: z.coerce.number<string>().positive("Enter a discount above 0."),
+    /** Optional cap for a percentage discount; "" for none. */
+    max_discount_amount: z.string().trim().regex(/^(\d+(\.\d{1,2})?)?$/, "Enter an amount like 20 or 12.50."),
     /** "all" or an event id. */
     event_id: z.string().min(1),
     usage_limit: z.coerce.number<string>().int("Use a whole number.").positive("Enter how many times it can be used."),

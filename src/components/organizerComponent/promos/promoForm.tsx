@@ -31,26 +31,33 @@ const randomCode = () => Array.from({ length: 8 }, () => CODE_CHARS[Math.floor(M
 
 interface PromoFormProps {
   events: PromoEventOption[];
+  /** Codes in use by other promos (the one being edited is left out). */
   takenCodes: string[];
+  /** Editing a code nobody has used yet; omitted when creating. */
+  initial?: PromoFormValues;
 }
 
-export function PromoForm({ events, takenCodes }: PromoFormProps) {
-  const [values, setValues] = useState<PromoFormValues>({
-    code: "",
-    discount_type: "percentage",
-    discount_value: "",
-    event_id: "all",
-    usage_limit: "",
-    per_user_limit: "1",
-    starts_on: "",
-    ends_on: "",
-  });
+const EMPTY: PromoFormValues = {
+  code: "",
+  discount_type: "percentage",
+  discount_value: "",
+  max_discount_amount: "",
+  event_id: "all",
+  usage_limit: "",
+  per_user_limit: "1",
+  starts_on: "",
+  ends_on: "",
+};
+
+export function PromoForm({ events, takenCodes, initial }: PromoFormProps) {
+  const editing = initial !== undefined;
+  const [values, setValues] = useState<PromoFormValues>(initial ?? EMPTY);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [created, setCreated] = useState<{ code: string; discount: string } | null>(null);
 
   const set = <K extends keyof PromoFormValues>(key: K, value: PromoFormValues[K]) =>
     setValues((current) => ({ ...current, [key]: value }));
-  const text = (key: "code" | "discount_value" | "usage_limit" | "per_user_limit") => ({
+  const text = (key: "code" | "discount_value" | "max_discount_amount" | "usage_limit" | "per_user_limit") => ({
     id: key,
     value: values[key],
     "aria-invalid": errors[key] ? true : undefined,
@@ -76,8 +83,9 @@ export function PromoForm({ events, takenCodes }: PromoFormProps) {
 
     setErrors(next);
     if (!result.success || Object.keys(next).length > 0) return;
-    // Stands in for creating the code on the backend: nothing is stored.
-    setCreated({ code: result.data.code, discount: formatDiscount(result.data) });
+    // Stands in for creating or updating the code on the backend: nothing is stored.
+    const cap = result.data.discount_type === "percentage" && result.data.max_discount_amount ? Number(result.data.max_discount_amount) : null;
+    setCreated({ code: result.data.code, discount: formatDiscount({ ...result.data, max_discount_amount: cap }) });
   }
 
   if (created) {
@@ -87,7 +95,7 @@ export function PromoForm({ events, takenCodes }: PromoFormProps) {
           {created.code}
         </p>
         <div className="max-w-xl space-y-2">
-          <h2 className="font-heading text-2xl font-semibold sm:text-3xl">Promo code created</h2>
+          <h2 className="font-heading text-2xl font-semibold sm:text-3xl">{editing ? "Promo code updated" : "Promo code created"}</h2>
           <p className="text-text-primary/70">
             Buyers get {created.discount} when they enter this code at checkout, from the start date until it ends or
             runs out.
@@ -97,17 +105,19 @@ export function PromoForm({ events, takenCodes }: PromoFormProps) {
           <ButtonLink href="/organizer/promos" hoverScale={1.02} className="h-11 rounded-full px-5 font-semibold">
             Back to promo codes
           </ButtonLink>
-          <Button
-            variant="outline"
-            hoverScale={1}
-            onClick={() => {
-              setCreated(null);
-              setValues((current) => ({ ...current, code: "" }));
-            }}
-            className="h-11 rounded-full px-5"
-          >
-            Create another
-          </Button>
+          {!editing && (
+            <Button
+              variant="outline"
+              hoverScale={1}
+              onClick={() => {
+                setCreated(null);
+                setValues((current) => ({ ...current, code: "" }));
+              }}
+              className="h-11 rounded-full px-5"
+            >
+              Create another
+            </Button>
+          )}
         </div>
       </div>
     );
@@ -155,6 +165,16 @@ export function PromoForm({ events, takenCodes }: PromoFormProps) {
               className="h-11"
             />
           </FormField>
+          {values.discount_type === "percentage" && (
+            <FormField
+              id="max_discount_amount"
+              label="Maximum discount (USD, optional)"
+              hint="Caps the discount on big orders, e.g. 15% off, up to $20."
+              error={errors.max_discount_amount}
+            >
+              <Input {...text("max_discount_amount")} type="number" inputMode="decimal" min={0} step="0.5" className="h-11" />
+            </FormField>
+          )}
         </div>
       </FormSection>
 
@@ -194,7 +214,7 @@ export function PromoForm({ events, takenCodes }: PromoFormProps) {
 
       <div className="flex justify-end">
         <Button type="submit" hoverScale={1.02} className="h-12 rounded-full px-8 text-base font-semibold">
-          Create promo code
+          {editing ? "Save changes" : "Create promo code"}
         </Button>
       </div>
     </form>

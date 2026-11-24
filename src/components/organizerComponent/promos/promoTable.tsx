@@ -1,6 +1,7 @@
 "use client";
 
-import { Copy, Ellipsis, Power, Trash2 } from "lucide-react";
+import { Copy, Ellipsis, Pencil, Power, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import {
   DropdownMenu,
@@ -30,12 +31,13 @@ interface PromoTableProps {
 const canToggle = (promo: Promo) => ["active", "scheduled", "inactive"].includes(promo.status);
 
 export function PromoTable({ promos, eventTitles, copiedId, onCopy, onToggle, onDelete }: PromoTableProps) {
+  const router = useRouter();
   if (promos.length === 0) {
     return <EmptyState title="No promo codes here" description="Codes with this status will show up in this list." />;
   }
 
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-200">
         <TableHeader>
           <TableRow>
@@ -90,6 +92,12 @@ export function PromoTable({ promos, eventTitles, copiedId, onCopy, onToggle, on
                         <Copy aria-hidden="true" />
                         Copy code
                       </DropdownMenuItem>
+                      {promo.used_count === 0 && promo.status !== "expired" && (
+                        <DropdownMenuItem onSelect={() => router.push(`/organizer/promos/${promo.id}/edit`)}>
+                          <Pencil aria-hidden="true" />
+                          Edit
+                        </DropdownMenuItem>
+                      )}
                       {canToggle(promo) && (
                         <DropdownMenuItem onSelect={() => onToggle(promo)}>
                           <Power aria-hidden="true" />
