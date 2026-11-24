@@ -35,3 +35,19 @@ export const FavoriteGenresSchema = z.object({
   favorite_genres: z.array(z.string()).min(1, "Pick at least one genre.").max(10, "Pick up to 10 genres."),
 });
 export type FavoriteGenres = z.infer<typeof FavoriteGenresSchema>;
+
+/** user_profiles.gender is a free string in the backend; these are the options offered. */
+export const GENDERS = ["female", "male", "unspecified"] as const;
+
+/** The optional user_profiles fields (backend models), edited on the profile page. */
+export const PersonalInfoSchema = z.object({
+  /** "YYYY-MM-DD", or "" when not given. */
+  date_of_birth: z.string(),
+  gender: z.enum(GENDERS),
+  address_line: z.string().trim().max(200, "Keep it under 200 characters."),
+  city: z.string().trim().max(80),
+  province: z.string().trim().max(80),
+  postal_code: z.string().trim().regex(/^(\d{5})?$/, "Indonesian postal codes have 5 digits."),
+  country: z.string().trim().min(2, "Enter your country."),
+});
+export type PersonalInfo = z.infer<typeof PersonalInfoSchema>;

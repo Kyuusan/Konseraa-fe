@@ -1,6 +1,7 @@
 import { EVENTS, FAVORITE_GENRES } from "@/__fixtures__/events";
 import { getCurrentOrganizer, getCurrentSession } from "@/__fixtures__/session";
 import { FavoriteGenresForm } from "@/components/accountComponent/favoriteGenresForm";
+import { PersonalInfoForm } from "@/components/accountComponent/personalInfoForm";
 import { NotificationPreferencesForm } from "@/components/accountComponent/notificationPreferencesForm";
 import { PasswordForm } from "@/components/accountComponent/passwordForm";
 import { ProfileDetailsForm } from "@/components/accountComponent/profileDetailsForm";
@@ -9,6 +10,7 @@ import { FormSection } from "@/components/organizerComponent/onboarding/formSect
 import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
 import { StatusBadge } from "@/components/userComponent/shared/statusBadge";
+import { currentYear } from "@/lib/format";
 
 // One account for fans and organizers (agreed): the organizer part shows once they applied.
 export default async function Page() {
@@ -35,6 +37,25 @@ export default async function Page() {
 
       <FormSection id="details-heading" title="Personal details" description="Shown on your tickets and used by organizers at the gate.">
         <ProfileDetailsForm initial={{ full_name: user.full_name, phone: user.phone }} email={user.email} />
+      </FormSection>
+
+      <FormSection
+        id="info-heading"
+        title="Personal info"
+        description="Optional. City, province and country start from the domicile you picked at sign-up."
+      >
+        <PersonalInfoForm
+          currentYear={currentYear()}
+          initial={{
+            date_of_birth: "",
+            gender: "unspecified",
+            address_line: "",
+            city: "Jakarta",
+            province: "DKI Jakarta",
+            postal_code: "",
+            country: "Indonesia",
+          }}
+        />
       </FormSection>
 
       <FormSection

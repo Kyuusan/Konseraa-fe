@@ -39,3 +39,6 @@ const compactPriceFormatter = new Intl.NumberFormat("en-US", {
 export function formatPriceCompact(amount: number) {
   return compactPriceFormatter.format(amount);
 }
+
+/** The current calendar year, for ranges like a date-of-birth picker. */
+export const currentYear = () => new Date().getFullYear();

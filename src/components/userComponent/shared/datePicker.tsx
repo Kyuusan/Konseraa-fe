@@ -26,11 +26,25 @@ interface DatePickerProps {
   placeholder?: string;
   /** Days before today cannot be picked. */
   disablePast?: boolean;
+  /** Days after today cannot be picked (e.g. a date of birth). */
+  disableFuture?: boolean;
+  /** Month and year dropdowns, for dates far from today. */
+  yearPicker?: { from: number; to: number };
   invalid?: boolean;
   className?: string;
 }
 
-export function DatePicker({ id, value, onChange, placeholder = "Pick a date", disablePast, invalid, className }: DatePickerProps) {
+export function DatePicker({
+  id,
+  value,
+  onChange,
+  placeholder = "Pick a date",
+  disablePast,
+  disableFuture,
+  yearPicker,
+  invalid,
+  className,
+}: DatePickerProps) {
   const [open, setOpen] = useState(false);
   // Read the clock when the popover opens, not while rendering.
   const [today, setToday] = useState<Date>();
@@ -61,7 +75,10 @@ export function DatePicker({ id, value, onChange, placeholder = "Pick a date", d
           mode="single"
           selected={selected}
           defaultMonth={selected}
-          disabled={disablePast && today ? { before: today } : undefined}
+          disabled={today && (disablePast || disableFuture) ? (disablePast ? { before: today } : { after: today }) : undefined}
+          captionLayout={yearPicker ? "dropdown" : "label"}
+          startMonth={yearPicker ? new Date(yearPicker.from, 0) : undefined}
+          endMonth={yearPicker ? new Date(yearPicker.to, 11) : undefined}
           onSelect={(date: Date | undefined) => {
             if (!date) return;
             onChange(toValue(date));
