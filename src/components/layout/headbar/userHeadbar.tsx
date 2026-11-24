@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, Receipt, User } from "lucide-react";
+import { Heart, LogOut, Receipt, User } from "lucide-react";
 import { getUnreadCount } from "@/__fixtures__/notifications";
 import { BrandLogo } from "../shared/brandLogo";
 import { USER_NAV } from "../shared/navigation";
@@ -13,6 +13,7 @@ import { UserBottomNav } from "./userBottomNav";
 const PROFILE_LINKS: ProfileLink[] = [
   { label: "Profile", href: "/profile", icon: User },
   { label: "My orders", href: "/orders", icon: Receipt },
+  { label: "Saved events", href: "/saved", icon: Heart },
   { label: "Log out", href: "/login", icon: LogOut },
 ];
 

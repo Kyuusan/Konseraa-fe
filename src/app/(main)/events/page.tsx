@@ -2,6 +2,7 @@ import { EVENTS } from "@/__fixtures__/events";
 import { param } from "@/components/userComponent/checkout/checkoutParams";
 import { EventCatalog } from "@/components/userComponent/eventCatalog/eventCatalog";
 import { ALL_CITIES, DEFAULT_FILTERS } from "@/components/userComponent/eventCatalog/filterEvents";
+import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
 
 type PageProps = { searchParams: Promise<Record<string, string | string[] | undefined>> };
@@ -23,7 +24,16 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <div className="space-y-8">
-      <PageHeader eyebrow="Explore" title="All events" description="Concerts and festivals with tickets on sale now." />
+      <PageHeader
+        eyebrow="Explore"
+        title="All events"
+        description="Concerts and festivals with tickets on sale now."
+        actions={
+          <ButtonLink href="/saved" variant="outline" className="h-11 rounded-full px-5">
+            Saved events
+          </ButtonLink>
+        }
+      />
       <EventCatalog events={events} cities={cities} genres={genres} initialFilters={initialFilters} />
     </div>
   );

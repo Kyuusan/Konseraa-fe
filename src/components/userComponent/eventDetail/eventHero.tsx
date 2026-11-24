@@ -2,6 +2,7 @@ import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatTime } from "@/lib/format";
 import type { ConcertEvent } from "@/types/event";
+import { FavoriteButton } from "../shared/favoriteButton";
 import { StatusBadge } from "../shared/statusBadge";
 
 const mapsUrl = (event: ConcertEvent) =>
@@ -21,7 +22,10 @@ export function EventHero({ event }: { event: ConcertEvent }) {
             <Badge key={genre} variant="outline" className="rounded-full">{genre}</Badge>
           ))}
         </div>
-        <h1 className="font-heading text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl">{event.title}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <h1 className="font-heading text-4xl leading-[1.05] font-bold tracking-tight sm:text-5xl">{event.title}</h1>
+          <FavoriteButton eventId={event.id} eventTitle={event.title} variant="pill" />
+        </div>
         <dl className="grid gap-4 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-xs font-semibold tracking-widest text-text-muted uppercase">Date</dt>

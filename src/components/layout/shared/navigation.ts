@@ -37,7 +37,7 @@ export function isActivePath(pathname: string, item: NavItem) {
 
 export const USER_NAV: NavItem[] = [
   { label: "Home", href: "/home", icon: House },
-  { label: "Explore", href: "/events", icon: Compass },
+  { label: "Explore", href: "/events", icon: Compass, also: ["/saved"] },
   { label: "Tickets", href: "/tickets", icon: Ticket, also: ["/orders"] },
   { label: "Organizer", href: "/organizer", icon: Briefcase },
 ];
