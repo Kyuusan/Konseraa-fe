@@ -2,14 +2,22 @@ import { FileText } from "lucide-react";
 import type { ReactNode } from "react";
 import { StatusBadge } from "@/components/userComponent/shared/statusBadge";
 import { formatDateTime } from "@/lib/format";
-import type { DocumentFile } from "@/types/organizer";
+import { type DocumentFile, documentName } from "@/types/organizer";
 import { ADMIN_TIME_ZONE } from "../dashboard/reviewQueueCard";
 
 const fileSize = (bytes: number) =>
   bytes >= 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;
 
+interface DocumentChipProps {
+  label: string;
+  /** A picked file (name and size known)... */
+  file?: DocumentFile | null;
+  /** ...or a stored document, known only by its document_url. */
+  url?: string;
+}
+
 /** An uploaded document. Opening it needs file storage, which the demo does not have. */
-export function DocumentChip({ label, file }: { label: string; file: DocumentFile | null }) {
+export function DocumentChip({ label, file, url }: DocumentChipProps) {
   return (
     <div className="flex items-center gap-3 rounded-2xl bg-bg-surface-2 p-4">
       <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-bg-surface text-text-primary/80">
@@ -23,6 +31,11 @@ export function DocumentChip({ label, file }: { label: string; file: DocumentFil
             <p className="text-xs text-text-primary/70">
               {fileSize(file.size)} · {file.mime_type === "application/pdf" ? "PDF" : "Image"}
             </p>
+          </>
+        ) : url ? (
+          <>
+            <p className="truncate text-sm font-semibold">{documentName(url)}</p>
+            <p className="text-xs text-text-primary/70">{url.toLowerCase().endsWith(".pdf") ? "PDF" : "Image"}</p>
           </>
         ) : (
           <p className="text-sm text-text-primary/70">Not provided</p>

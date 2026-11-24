@@ -1,45 +1,30 @@
 "use client";
 
-import { Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/tableBase";
 import { StatusBadge } from "@/components/userComponent/shared/statusBadge";
 import { formatDateTime } from "@/lib/format";
 import type { AdminVerification } from "@/types/admin";
+import { DOCUMENT_LABELS } from "@/types/organizer";
 import { ADMIN_TIME_ZONE } from "../dashboard/reviewQueueCard";
 import { DecisionPanel } from "./decisionPanel";
 import { DecisionResult, DocumentChip, FactList, ReviewSection } from "./reviewParts";
 import { ReviewQueue } from "./reviewQueue";
 
+// The person in charge is the account owner (organizers.user_id), so the KTP is
+// matched against the account name.
 const CHECKLIST = [
-  "The name and NIK match the KTP photo, and the photo is readable.",
-  "The KTP belongs to the person in charge, not someone else.",
-  "The organizer name and address look genuine (and match the NIB, if attached).",
+  "The name on the KTP matches the account owner, and the photo is readable.",
+  "The KTP belongs to the account owner, not someone else.",
+  "The organizer name looks genuine (and matches the NIB, if attached).",
 ];
 
 const submitted = (iso: string) =>
   formatDateTime(iso, ADMIN_TIME_ZONE, { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
 
-/** NIK is personal data: masked until the admin needs to compare it. */
-function MaskedNik({ nik }: { nik: string }) {
-  const [shown, setShown] = useState(false);
-  return (
-    <span className="inline-flex items-center gap-2">
-      <span className="font-mono">{shown ? nik : `${nik.slice(0, 4)} •••• •••• ${nik.slice(-4)}`}</span>
-      <Button
-        variant="ghost"
-        size="icon"
-        hoverScale={1}
-        onClick={() => setShown((value) => !value)}
-        aria-label={shown ? "Hide NIK" : "Show NIK"}
-        className="size-7 rounded-full"
-      >
-        {shown ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
-      </Button>
-    </span>
-  );
-}
+const entityLabel = (item: AdminVerification) => (item.organizer.legal_entity_type === "company" ? "Company" : "Individual");
+const waiting = (item: AdminVerification) =>
+  item.organizer.verification_status === "pending" || item.organizer.verification_status === "in_review";
 
 export function VerificationReviews({ items, initialOpenId }: { items: AdminVerification[]; initialOpenId?: string }) {
   return (
@@ -47,20 +32,20 @@ export function VerificationReviews({ items, initialOpenId }: { items: AdminVeri
       items={items}
       initialOpenId={initialOpenId}
       getId={(item) => item.organizer.id}
-      isWaiting={(item) => item.verification.status === "pending" || item.verification.status === "in_review"}
+      isWaiting={waiting}
       emptyWaiting="No organizer applications are waiting."
       sheetTitle={(item) => item.organizer.company_name}
-      sheetDescription={(item) => `Submitted ${submitted(item.verification.submitted_at)}`}
+      sheetDescription={(item) => `Submitted ${submitted(item.submitted_at)}`}
       applyDecision={(item, decision, decidedAt) => {
         const status = decision.approved ? ("approved" as const) : ("rejected" as const);
+        const reason = decision.approved ? null : decision.rejection_reason;
         return {
+          ...item,
           organizer: { ...item.organizer, verification_status: status },
-          verification: {
-            ...item.verification,
-            status,
-            reviewed_at: decidedAt,
-            rejection_reason: decision.approved ? null : decision.rejection_reason,
-          },
+          // Each organizer_verifications row gets the decision.
+          documents: item.documents.map((document) => ({ ...document, status, reviewed_at: decidedAt, rejection_reason: reason })),
+          reviewed_at: decidedAt,
+          rejection_reason: reason,
         };
       }}
       renderTable={(rows, open) => (
@@ -69,7 +54,7 @@ export function VerificationReviews({ items, initialOpenId }: { items: AdminVeri
             <TableHeader>
               <TableRow>
                 <TableHead>Organizer</TableHead>
-                <TableHead>Person in charge</TableHead>
+                <TableHead>Account owner</TableHead>
                 <TableHead>Submitted</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-px">
@@ -78,22 +63,20 @@ export function VerificationReviews({ items, initialOpenId }: { items: AdminVeri
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map(({ organizer, verification }) => (
-                <TableRow key={organizer.id}>
+              {rows.map((item) => (
+                <TableRow key={item.organizer.id}>
                   <TableCell>
-                    <p className="font-semibold">{organizer.company_name}</p>
-                    <p className="text-xs text-text-primary/70">
-                      {organizer.organizer_type === "company" ? "Company" : "Individual"} · {organizer.city}
-                    </p>
+                    <p className="font-semibold">{item.organizer.company_name}</p>
+                    <p className="text-xs text-text-primary/70">{entityLabel(item)}</p>
                   </TableCell>
-                  <TableCell className="text-text-primary/80">{verification.person_in_charge.full_name}</TableCell>
-                  <TableCell className="whitespace-nowrap text-text-primary/70">{submitted(verification.submitted_at)}</TableCell>
+                  <TableCell className="text-text-primary/80">{item.owner.full_name}</TableCell>
+                  <TableCell className="whitespace-nowrap text-text-primary/70">{submitted(item.submitted_at)}</TableCell>
                   <TableCell>
-                    <StatusBadge status={verification.status} />
+                    <StatusBadge status={item.organizer.verification_status} />
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" hoverScale={1} onClick={() => open(organizer.id)} className="rounded-full">
-                      {verification.status === "pending" || verification.status === "in_review" ? "Review" : "View"}
+                    <Button variant="outline" size="sm" hoverScale={1} onClick={() => open(item.organizer.id)} className="rounded-full">
+                      {waiting(item) ? "Review" : "View"}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -102,57 +85,47 @@ export function VerificationReviews({ items, initialOpenId }: { items: AdminVeri
           </Table>
         </div>
       )}
-      renderDetail={({ organizer, verification }, decide) => {
-        const pic = verification.person_in_charge;
-        const decided = verification.status === "approved" || verification.status === "rejected";
-        return (
-          <>
-            <ReviewSection title="Organizer">
-              <FactList
-                facts={[
-                  { label: "Type", value: organizer.organizer_type === "company" ? "Company" : "Individual" },
-                  { label: "City", value: organizer.city },
-                  { label: "Address", value: organizer.address },
-                ]}
+      renderDetail={(item, decide) => (
+        <>
+          <ReviewSection title="Organizer">
+            <FactList facts={[{ label: "Name", value: item.organizer.company_name }, { label: "Type", value: entityLabel(item) }]} />
+          </ReviewSection>
+          <ReviewSection title="Account owner">
+            <FactList
+              facts={[
+                { label: "Full name", value: item.owner.full_name },
+                { label: "Email", value: item.owner.email },
+                { label: "Phone", value: item.owner.phone ?? "Not set" },
+              ]}
+            />
+          </ReviewSection>
+          <ReviewSection title="Documents">
+            <div className="grid gap-3 sm:grid-cols-2">
+              {item.documents.map((document) => (
+                <DocumentChip key={document.id} label={DOCUMENT_LABELS[document.document_type]} url={document.document_url} />
+              ))}
+            </div>
+          </ReviewSection>
+          <ReviewSection title="Decision">
+            {waiting(item) ? (
+              <DecisionPanel
+                key={item.organizer.id}
+                checklist={CHECKLIST}
+                approveLabel="Approve organizer"
+                rejectHint="e.g. The KTP photo is blurry, so the name cannot be read. Upload a clearer photo."
+                onDecide={decide}
               />
-            </ReviewSection>
-            <ReviewSection title="Person in charge">
-              <FactList
-                facts={[
-                  { label: "Full name", value: pic.full_name },
-                  { label: "NIK", value: <MaskedNik nik={pic.nik} /> },
-                  { label: "Phone", value: pic.phone },
-                  { label: "Email", value: pic.email },
-                ]}
+            ) : (
+              <DecisionResult
+                status={item.organizer.verification_status === "approved" ? "approved" : "rejected"}
+                decidedAt={item.reviewed_at}
+                reason={item.rejection_reason}
+                approvedNote="Organizer tools are unlocked. They can now create events."
               />
-            </ReviewSection>
-            <ReviewSection title="Documents">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <DocumentChip label="KTP" file={verification.id_card} />
-                {organizer.organizer_type === "company" && <DocumentChip label="NIB or deed" file={verification.business_document} />}
-              </div>
-            </ReviewSection>
-            <ReviewSection title="Decision">
-              {decided ? (
-                <DecisionResult
-                  status={verification.status === "approved" ? "approved" : "rejected"}
-                  decidedAt={verification.reviewed_at}
-                  reason={verification.rejection_reason}
-                  approvedNote="Organizer tools are unlocked. They can now create events."
-                />
-              ) : (
-                <DecisionPanel
-                  key={organizer.id}
-                  checklist={CHECKLIST}
-                  approveLabel="Approve organizer"
-                  rejectHint="e.g. The KTP photo is blurry, so the NIK cannot be read. Upload a clearer photo."
-                  onDecide={decide}
-                />
-              )}
-            </ReviewSection>
-          </>
-        );
-      }}
+            )}
+          </ReviewSection>
+        </>
+      )}
     />
   );
 }

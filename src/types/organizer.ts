@@ -1,40 +1,34 @@
 import { z } from "zod";
 import { ConcertEventSchema } from "./event";
 
-// Organizer shape follows openapi-spec.yaml (id, company_name, verification_status).
-// Everything marked "not in spec" comes from the agreed verification flow and the
-// organizers / organizer_verifications tables in PRD §4; confirm with backend.
+// Shapes follow the backend models (organizers, organizer_verifications). Fields the
+// backend does not store (city, address, person-in-charge NIK) were removed: the
+// person in charge is the account owner (organizers.user_id).
 
 export const ORGANIZER_VERIFICATION_STATUSES = ["pending", "in_review", "approved", "rejected"] as const;
 export type OrganizerVerificationStatus = (typeof ORGANIZER_VERIFICATION_STATUSES)[number];
 
-/** Not in spec. */
-export const ORGANIZER_TYPES = ["individual", "company"] as const;
-export type OrganizerType = (typeof ORGANIZER_TYPES)[number];
+/** organizers.legal_entity_type (a free string in the backend; these are the values the UI offers). */
+export const LEGAL_ENTITY_TYPES = ["individual", "company"] as const;
+export type LegalEntityType = (typeof LEGAL_ENTITY_TYPES)[number];
 
 export const OrganizerSchema = z.object({
   id: z.uuid(),
   company_name: z.string(),
   verification_status: z.enum(ORGANIZER_VERIFICATION_STATUSES),
-  /** Not in spec. */
-  organizer_type: z.enum(ORGANIZER_TYPES),
-  /** Not in spec. */
-  city: z.string(),
-  /** Not in spec. */
-  address: z.string(),
+  legal_entity_type: z.enum(LEGAL_ENTITY_TYPES),
 });
 export type Organizer = z.infer<typeof OrganizerSchema>;
 
-/** Not in spec: the person accountable for the organizer (KYC). */
-export const PersonInChargeSchema = z.object({
-  full_name: z.string().trim().min(1, "Enter the full name on the ID card."),
-  nik: z.string().regex(/^\d{16}$/, "The NIK is the 16-digit number on the ID card."),
-  phone: z.string().regex(/^\+?\d{9,15}$/, "Enter a phone number with 9–15 digits."),
-  email: z.email("Enter a valid email address."),
+/** The account behind an organizer (users + user_profiles), shown as the person in charge. */
+export const AccountOwnerSchema = z.object({
+  full_name: z.string(),
+  email: z.email(),
+  phone: z.string().nullable(),
 });
-export type PersonInCharge = z.infer<typeof PersonInChargeSchema>;
+export type AccountOwner = z.infer<typeof AccountOwnerSchema>;
 
-/** Not in spec: metadata of an uploaded document. */
+/** A picked file before upload; the backend stores only its document_url. */
 export const DocumentFileSchema = z.object({
   name: z.string(),
   size: z.int().nonnegative(),
@@ -42,32 +36,40 @@ export const DocumentFileSchema = z.object({
 });
 export type DocumentFile = z.infer<typeof DocumentFileSchema>;
 
-/** Not in spec: one submission in organizer_verifications (an organizer can resubmit). */
+/** organizer_verifications.document_type values the UI uploads. */
+export const DOCUMENT_TYPES = ["id_card", "business_license"] as const;
+export type DocumentType = (typeof DOCUMENT_TYPES)[number];
+
+export const DOCUMENT_LABELS: Record<DocumentType, string> = {
+  id_card: "ID card (KTP)",
+  business_license: "NIB or deed of establishment",
+};
+
+/** One row of organizer_verifications: one uploaded document and its review. */
 export const OrganizerVerificationSchema = z.object({
   id: z.uuid(),
   organizer_id: z.uuid(),
+  document_type: z.enum(DOCUMENT_TYPES),
+  document_url: z.string(),
   status: z.enum(ORGANIZER_VERIFICATION_STATUSES),
-  person_in_charge: PersonInChargeSchema,
-  id_card: DocumentFileSchema,
-  business_document: DocumentFileSchema.nullable(),
-  submitted_at: z.iso.datetime({ offset: true }),
   reviewed_at: z.iso.datetime({ offset: true }).nullable(),
   rejection_reason: z.string().nullable(),
+  created_at: z.iso.datetime({ offset: true }),
 });
 export type OrganizerVerification = z.infer<typeof OrganizerVerificationSchema>;
 
-/** Not in spec: the "become an organizer" form, derived from the shapes above. */
-export const OrganizerApplicationSchema = OrganizerSchema.pick({ organizer_type: true })
-  .extend({
-    company_name: z.string().trim().min(2, "Enter the organizer name."),
-    city: z.string().trim().min(2, "Enter the city."),
-    address: z.string().trim().min(10, "Enter the full address."),
-    person_in_charge: PersonInChargeSchema,
-    id_card: DocumentFileSchema.nullable().refine(Boolean, "Upload the ID card (KTP) of the person in charge."),
-    business_document: DocumentFileSchema.nullable(),
-    declaration: z.literal(true, "Confirm that the data is correct."),
-  });
+/** The "become an organizer" form: only what organizers and organizer_verifications store. */
+export const OrganizerApplicationSchema = z.object({
+  legal_entity_type: z.enum(LEGAL_ENTITY_TYPES),
+  company_name: z.string().trim().min(2, "Enter the organizer name."),
+  id_card: DocumentFileSchema.nullable().refine(Boolean, "Upload the ID card (KTP) of the account owner."),
+  business_license: DocumentFileSchema.nullable(),
+  declaration: z.literal(true, "Confirm that the data is correct."),
+});
 export type OrganizerApplication = z.infer<typeof OrganizerApplicationSchema>;
+
+/** File name from a stored document URL, for display. */
+export const documentName = (url: string) => decodeURIComponent(url.split("/").at(-1) ?? url);
 
 /** Not in spec: a row of the organizer's own events, with its sales so far. */
 export const OrganizerEventSchema = ConcertEventSchema.extend({

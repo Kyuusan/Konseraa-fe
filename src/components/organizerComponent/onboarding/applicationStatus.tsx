@@ -1,6 +1,12 @@
 import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { Organizer, OrganizerVerification } from "@/types/organizer";
+import {
+  type AccountOwner,
+  DOCUMENT_LABELS,
+  documentName,
+  type Organizer,
+  type OrganizerVerification,
+} from "@/types/organizer";
 import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
 import { Perforation } from "@/components/userComponent/shared/perforation";
@@ -18,18 +24,21 @@ const TITLES: Record<Organizer["verification_status"], string> = {
 
 interface ApplicationStatusProps {
   organizer: Organizer;
-  verification: OrganizerVerification;
+  owner: AccountOwner;
+  /** One organizer_verifications row per uploaded document. */
+  documents: OrganizerVerification[];
+  review: { submitted_at: string; reviewed_at: string | null; rejection_reason: string | null };
 }
 
-export function ApplicationStatus({ organizer, verification }: ApplicationStatusProps) {
-  const status = verification.status;
+export function ApplicationStatus({ organizer, owner, documents, review }: ApplicationStatusProps) {
+  const status = organizer.verification_status;
   const steps = [
-    { label: "Submitted", done: true, detail: formatDateTime(verification.submitted_at, TIME_ZONE) },
+    { label: "Submitted", done: true, detail: formatDateTime(review.submitted_at, TIME_ZONE) },
     { label: "In review", done: status !== "pending", detail: status === "pending" ? "Waiting for an admin" : "Picked up by an admin" },
     {
       label: status === "rejected" ? "Changes requested" : "Decision",
       done: status === "approved" || status === "rejected",
-      detail: verification.reviewed_at ? formatDateTime(verification.reviewed_at, TIME_ZONE) : "Not decided yet",
+      detail: review.reviewed_at ? formatDateTime(review.reviewed_at, TIME_ZONE) : "Not decided yet",
     },
   ];
 
@@ -52,10 +61,10 @@ export function ApplicationStatus({ organizer, verification }: ApplicationStatus
         }
       />
 
-      {verification.rejection_reason && (
+      {review.rejection_reason && (
         <div role="alert" className="rounded-[20px] border border-danger/40 bg-danger/10 p-5">
           <p className="text-xs font-semibold tracking-widest text-danger uppercase">Reason from the reviewer</p>
-          <p className="mt-2">{verification.rejection_reason}</p>
+          <p className="mt-2">{review.rejection_reason}</p>
         </div>
       )}
 
@@ -72,10 +81,9 @@ export function ApplicationStatus({ organizer, verification }: ApplicationStatus
         <div className="flex flex-wrap items-start justify-between gap-3 p-6">
           <div>
             <p className="text-xs font-semibold tracking-widest text-text-muted uppercase">
-              {organizer.organizer_type === "company" ? "Company" : "Individual"}
+              {organizer.legal_entity_type === "company" ? "Company" : "Individual"}
             </p>
             <p className="font-heading text-2xl font-bold">{organizer.company_name}</p>
-            <p className="text-sm text-text-muted">{organizer.address}, {organizer.city}</p>
           </div>
           <StatusBadge status={status} />
         </div>
@@ -83,13 +91,19 @@ export function ApplicationStatus({ organizer, verification }: ApplicationStatus
         <dl className="grid gap-4 p-6 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-xs font-semibold tracking-widest text-text-muted uppercase">Person in charge</dt>
-            <dd className="mt-1 font-semibold">{verification.person_in_charge.full_name}</dd>
-            <dd className="text-text-muted">{verification.person_in_charge.email}</dd>
+            <dd className="mt-1 font-semibold">{owner.full_name}</dd>
+            <dd className="text-text-muted">{owner.email}</dd>
           </div>
           <div>
             <dt className="text-xs font-semibold tracking-widest text-text-muted uppercase">Documents</dt>
-            <dd className="mt-1">ID card (KTP): {verification.id_card.name}</dd>
-            {verification.business_document && <dd>Business document: {verification.business_document.name}</dd>}
+            {documents.map((document) => (
+              <dd key={document.id} className="mt-1 flex flex-wrap items-center gap-2">
+                <span>
+                  {DOCUMENT_LABELS[document.document_type]}: {documentName(document.document_url)}
+                </span>
+                {document.status === "rejected" && <StatusBadge status="rejected" />}
+              </dd>
+            ))}
           </div>
         </dl>
       </TicketCard>

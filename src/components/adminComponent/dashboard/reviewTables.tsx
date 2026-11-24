@@ -74,10 +74,10 @@ export function VerificationTable({ verifications }: { verifications: PendingVer
               <TableCell>
                 <p className="font-semibold">{item.organizer_name}</p>
                 <p className="text-xs text-text-primary/70">
-                  {item.organizer_type === "company" ? "Company" : "Individual"} · {item.city}
+                  {item.legal_entity_type === "company" ? "Company" : "Individual"}
                 </p>
               </TableCell>
-              <TableCell className="text-text-primary/80">{item.pic_name}</TableCell>
+              <TableCell className="text-text-primary/80">{item.owner_name}</TableCell>
               <TableCell className="whitespace-nowrap text-text-primary/70">{submitted(item.submitted_at)}</TableCell>
               <TableCell>
                 <StatusBadge status={item.status} />

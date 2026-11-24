@@ -44,15 +44,14 @@ export const PENDING_EVENT_REVIEWS = PendingEventReviewSchema.array().parse(
 );
 
 export const PENDING_VERIFICATIONS = PendingVerificationSchema.array().parse(
-  VERIFICATIONS.filter(({ verification }) => verification.status === "pending" || verification.status === "in_review").map(
-    ({ organizer, verification }) => ({
+  VERIFICATIONS.filter(({ organizer }) => organizer.verification_status === "pending" || organizer.verification_status === "in_review").map(
+    ({ organizer, owner, submitted_at }) => ({
       organizer_id: organizer.id,
       organizer_name: organizer.company_name,
-      organizer_type: organizer.organizer_type,
-      city: organizer.city,
-      pic_name: verification.person_in_charge.full_name,
-      status: verification.status,
-      submitted_at: verification.submitted_at,
+      legal_entity_type: organizer.legal_entity_type,
+      owner_name: owner.full_name,
+      status: organizer.verification_status,
+      submitted_at,
     }),
   ),
 );

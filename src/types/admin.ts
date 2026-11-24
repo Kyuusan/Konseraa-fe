@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { BOOKING_STATUSES } from "./booking";
-import { EventSessionSchema, TicketTierSchema, VenueSchema } from "./event";
+import { EventSessionSchema, TicketTierSchema, VenueLayoutSchema, VenueSchema } from "./event";
 import {
+  AccountOwnerSchema,
   DocumentFileSchema,
-  ORGANIZER_TYPES,
+  LEGAL_ENTITY_TYPES,
   ORGANIZER_VERIFICATION_STATUSES,
   OrganizerSchema,
   OrganizerVerificationSchema,
@@ -31,9 +32,8 @@ export type PendingEventReview = z.infer<typeof PendingEventReviewSchema>;
 export const PendingVerificationSchema = z.object({
   organizer_id: z.uuid(),
   organizer_name: z.string(),
-  organizer_type: z.enum(ORGANIZER_TYPES),
-  city: z.string(),
-  pic_name: z.string(),
+  legal_entity_type: z.enum(LEGAL_ENTITY_TYPES),
+  owner_name: z.string(),
   status: z.enum(ORGANIZER_VERIFICATION_STATUSES),
   submitted_at: IsoDateTime,
 });
@@ -72,10 +72,14 @@ export const AdminOverviewSchema = z.object({
 });
 export type AdminOverview = z.infer<typeof AdminOverviewSchema>;
 
-/** Not in spec: an organizer application as the admin reviews it. */
+/** An organizer application as the admin reviews it: the organizer, its owner and its documents. */
 export const AdminVerificationSchema = z.object({
   organizer: OrganizerSchema,
-  verification: OrganizerVerificationSchema,
+  owner: AccountOwnerSchema,
+  documents: z.array(OrganizerVerificationSchema),
+  submitted_at: IsoDateTime,
+  reviewed_at: IsoDateTime.nullable(),
+  rejection_reason: z.string().nullable(),
 });
 export type AdminVerification = z.infer<typeof AdminVerificationSchema>;
 
@@ -93,7 +97,8 @@ export const AdminEventReviewSchema = z.object({
   address: z.string(),
   sessions: z.array(EventSessionSchema),
   tiers: z.array(TicketTierSchema),
-  seat_map_url: z.string().nullable(),
+  /** The venue's sections and seats the tiers point to (backend models). */
+  layout: VenueLayoutSchema,
   /** The crowd permit / venue approval for this event (agreed rule). */
   permit: DocumentFileSchema,
   status: z.enum(EVENT_REVIEW_STATUSES),

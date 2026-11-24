@@ -11,7 +11,7 @@ const TOPICS = [
     questions: [
       {
         q: "What do I need to become an organizer?",
-        a: "Your organizer name, type, city and address, plus the person in charge: full name, NIK, phone, email and a photo of their KTP. Companies can add an NIB or deed to speed things up.",
+        a: "An organizer name and whether you are an individual or a company, plus a photo of your KTP. The organizer is tied to your account, so your account name, email and phone are used for the person in charge. Companies can add an NIB or deed to speed things up.",
       },
       {
         q: "My application was rejected. What now?",

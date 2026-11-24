@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
-import { getCurrentOrganizer } from "@/__fixtures__/session";
+import { getCurrentOrganizer, getCurrentSession } from "@/__fixtures__/session";
 import { ApplicationForm } from "@/components/organizerComponent/onboarding/applicationForm";
 import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
 
 export default async function Page() {
   const data = await getCurrentOrganizer();
+  const { user } = await getCurrentSession();
   const status = data?.organizer.verification_status;
   // Only first-time applicants and rejected applications can (re)submit.
   if (status && status !== "rejected") redirect("/organizer");
@@ -22,7 +23,10 @@ export default async function Page() {
           </ButtonLink>
         }
       />
-      <ApplicationForm initial={data?.application} />
+      <ApplicationForm
+        initial={data?.application}
+        owner={{ full_name: user.full_name, email: user.email, phone: user.phone || null }}
+      />
     </div>
   );
 }

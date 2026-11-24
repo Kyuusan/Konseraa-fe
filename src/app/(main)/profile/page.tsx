@@ -63,7 +63,7 @@ export default async function Page() {
             <div className="space-y-1">
               <p className="font-heading text-lg font-semibold">{organizerData.organizer.company_name}</p>
               <p className="text-sm text-text-primary/70">
-                {organizerData.organizer.organizer_type === "company" ? "Company" : "Individual"} · {organizerData.organizer.city}
+                {organizerData.organizer.legal_entity_type === "company" ? "Company" : "Individual"}
               </p>
               <StatusBadge status={organizerData.organizer.verification_status} />
             </div>

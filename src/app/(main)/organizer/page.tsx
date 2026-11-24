@@ -20,7 +20,7 @@ export default async function Page() {
   if (!data) return <OrganizerIntro />;
 
   if (data.organizer.verification_status !== "approved") {
-    return <ApplicationStatus organizer={data.organizer} verification={data.verification} />;
+    return <ApplicationStatus organizer={data.organizer} owner={data.owner} documents={data.documents} review={data.review} />;
   }
 
   const stats = getOrganizerDashboard();

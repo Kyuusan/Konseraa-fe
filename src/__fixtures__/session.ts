@@ -1,15 +1,17 @@
 // Dummy stand-in for the signed-in session and GET /organizer profile + latest
 // verification. Reads the demo cookies so every onboarding state can be tried.
 import { cookies } from "next/headers";
-import { OrganizerSchema, OrganizerVerificationSchema } from "@/types/organizer";
+import { AccountOwnerSchema, OrganizerSchema, OrganizerVerificationSchema } from "@/types/organizer";
 import { SessionSchema, UserSchema } from "@/types/user";
 import {
   DEMO_APPLICATION_COOKIE,
+  DEMO_FAVORITES_COOKIE,
   DEMO_GATEKEEPER_COOKIE,
   DEMO_ORGANIZER_STATES,
   DEMO_STATE_COOKIE,
   type DemoApplicationSummary,
   type DemoOrganizerState,
+  parseFavoriteIds,
 } from "./demoState";
 import { getGatekeeper } from "./gatekeepers";
 import { fixtureId } from "./ids";
@@ -28,11 +30,7 @@ const DEMO_USER = UserSchema.parse({
 
 const DEFAULT_APPLICATION: DemoApplicationSummary = {
   company_name: "Nada Kota Productions",
-  organizer_type: "company",
-  city: "Jakarta",
-  address: "Jl. Senopati No. 21, Kebayoran Baru, Jakarta Selatan",
-  pic_name: "Demo User",
-  pic_email: "user@konsera.test",
+  legal_entity_type: "company",
 };
 
 function parseApplication(raw: string | undefined): DemoApplicationSummary {
@@ -50,6 +48,12 @@ async function readDemo() {
   const raw = store.get(DEMO_STATE_COOKIE)?.value;
   const state: DemoOrganizerState = DEMO_ORGANIZER_STATES.find((item) => item === raw) ?? "none";
   return { state, application: parseApplication(store.get(DEMO_APPLICATION_COOKIE)?.value) };
+}
+
+/** Event ids the demo user saved (favorites). */
+export async function getSavedEventIds() {
+  const store = await cookies();
+  return parseFavoriteIds(store.get(DEMO_FAVORITES_COOKIE)?.value);
 }
 
 /** The signed-in gatekeeper, or null. Disabled accounts count as signed out. */
@@ -78,7 +82,10 @@ export async function getCurrentSession() {
   });
 }
 
-/** The current user's organizer profile and latest verification, or null if they never applied. */
+/**
+ * The current user's organizer profile, its documents (one organizer_verifications row
+ * each) and the review summary the status page needs, or null if they never applied.
+ */
 export async function getCurrentOrganizer() {
   const { state, application } = await readDemo();
   if (state === "none") return null;
@@ -87,32 +94,36 @@ export async function getCurrentOrganizer() {
     id: ORGANIZER_ID,
     company_name: application.company_name,
     verification_status: state,
-    organizer_type: application.organizer_type,
-    city: application.city,
-    address: application.address,
+    legal_entity_type: application.legal_entity_type,
   });
 
-  const verification = OrganizerVerificationSchema.parse({
-    id: fixtureId(1201),
-    organizer_id: ORGANIZER_ID,
-    status: state,
-    person_in_charge: {
-      full_name: application.pic_name,
-      nik: "3174010101900001",
-      phone: "+6281234567890",
-      email: application.pic_email,
+  const submittedAt = "2026-11-17T09:30:00+07:00";
+  const reviewedAt = state === "approved" || state === "rejected" ? "2026-11-18T14:05:00+07:00" : null;
+  const rejectionReason =
+    state === "rejected" ? "The ID card photo is blurry, so the name cannot be read. Please upload a clearer photo." : null;
+
+  const documents = OrganizerVerificationSchema.array().parse([
+    {
+      id: fixtureId(1201), organizer_id: ORGANIZER_ID, document_type: "id_card",
+      document_url: "https://files.konsera.id/organizers/ktp-demo-user.jpg",
+      status: state, reviewed_at: reviewedAt, rejection_reason: rejectionReason, created_at: submittedAt,
     },
-    id_card: { name: "ktp-pic.jpg", size: 412_000, mime_type: "image/jpeg" },
-    business_document: application.organizer_type === "company"
-      ? { name: "nib-nada-kota.pdf", size: 820_000, mime_type: "application/pdf" }
-      : null,
-    submitted_at: "2026-11-17T09:30:00+07:00",
-    reviewed_at: state === "approved" || state === "rejected" ? "2026-11-18T14:05:00+07:00" : null,
-    rejection_reason:
-      state === "rejected"
-        ? "The ID card photo is blurry, so the NIK cannot be read. Please upload a clearer photo."
-        : null,
-  });
+    ...(application.legal_entity_type === "company"
+      ? [{
+          id: fixtureId(1202), organizer_id: ORGANIZER_ID, document_type: "business_license",
+          document_url: "https://files.konsera.id/organizers/nib-nada-kota.pdf",
+          status: state === "rejected" ? "approved" : state, reviewed_at: reviewedAt, rejection_reason: null, created_at: submittedAt,
+        }]
+      : []),
+  ]);
 
-  return { organizer, verification, application };
+  const owner = AccountOwnerSchema.parse({ full_name: DEMO_USER.full_name, email: DEMO_USER.email, phone: DEMO_USER.phone });
+
+  return {
+    organizer,
+    owner,
+    documents,
+    review: { submitted_at: submittedAt, reviewed_at: reviewedAt, rejection_reason: rejectionReason },
+    application,
+  };
 }

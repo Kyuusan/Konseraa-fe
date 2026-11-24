@@ -10,9 +10,9 @@ const STEPS = [
 ];
 
 const REQUIREMENTS = [
-  "Organizer name, city and full address",
-  "Full name, NIK, phone and email of the person in charge",
-  "A photo or scan of that person's ID card (KTP)",
+  "An organizer name, as an individual or a company",
+  "Your account's name, email and phone: you are the person in charge",
+  "A photo or scan of your ID card (KTP)",
   "For companies: NIB or deed of establishment (optional)",
 ];
 
