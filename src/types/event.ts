@@ -114,6 +114,8 @@ export const EventSessionSchema = z.object({
 });
 export type EventSession = z.infer<typeof EventSessionSchema>;
 
+export const REVIEW_STATUSES = ["published", "hidden"] as const;
+
 /** Not in spec (no review endpoint yet): mirrors the reviews table. */
 export const ReviewSchema = z.object({
   id: z.uuid(),
@@ -122,6 +124,8 @@ export const ReviewSchema = z.object({
   comment: z.string(),
   /** reviews.photo_urls in the backend models (not in the OpenAPI spec). */
   photo_urls: z.array(z.string()).default([]),
+  /** reviews.status in the backend models: admins hide reviews that break the rules. */
+  status: z.enum(REVIEW_STATUSES).default("published"),
   created_at: IsoDateTime,
 });
 export type Review = z.infer<typeof ReviewSchema>;

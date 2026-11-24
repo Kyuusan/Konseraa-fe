@@ -92,7 +92,7 @@ export function ReviewList({ reviews: initial, pastShow, eventEnded, canReview, 
 
   function addReview(values: ReviewFormValues) {
     const id = crypto.randomUUID();
-    setReviews((current) => [{ id, user_full_name: reviewerName, created_at: new Date().toISOString(), ...values }, ...current]);
+    setReviews((current) => [{ id, user_full_name: reviewerName, status: "published" as const, created_at: new Date().toISOString(), ...values }, ...current]);
     setOwnId(id);
   }
 

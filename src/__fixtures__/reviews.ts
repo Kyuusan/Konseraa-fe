@@ -1,17 +1,20 @@
 // Dummy reviews (no review endpoint in the spec yet). Reviews belong to a show that
 // has ended (PRD §F); upcoming events show the reviews of their previous edition.
 import { PastShowReviewsSchema, ReviewSchema, type ConcertEvent, type PastShowReviews, type Review } from "@/types/event";
-import { getEventReviews } from "./events";
+import { EVENTS, getEventReviews } from "./events";
 import { fixtureId, unsplash } from "./ids";
 import { TICKETS } from "./tickets";
 
 let next = 2600;
-const review = (user_full_name: string, rating: number, comment: string, created_at: string, photos: string[] = []) => ({
+const review = (
+  user_full_name: string, rating: number, comment: string, created_at: string, photos: string[] = [], status = "published",
+) => ({
   id: fixtureId(next++),
   user_full_name,
   rating,
   comment,
   photo_urls: photos.map((photo) => unsplash(photo, 1200, 1200)),
+  status,
   created_at,
 });
 
@@ -24,6 +27,8 @@ const MORE_ECHOES = ReviewSchema.array().parse([
   review("Kevin H.", 4, "The new songs sound even bigger live. Merch line was long, so go early.", "2026-10-20T11:30:00+07:00", [CROWD]),
   review("Ayu P.", 5, "Perfect setlist and the lights during the last song were unreal.", "2026-10-21T08:15:00+07:00", [LIGHTS, STAGE]),
   review("Daniel K.", 3, "Good band, but the sound at the back of the hall was muddy.", "2026-10-22T19:45:00+07:00"),
+  // Hidden by an admin: ticket reselling spam.
+  review("Tiket Murah", 5, "Cheap tickets for every show, message me on WhatsApp 0812-xxxx-xxxx!!!", "2026-10-23T02:14:00+07:00", [], "hidden"),
 ]);
 
 const PAST_SHOWS: Record<string, unknown> = {
@@ -80,15 +85,44 @@ const PAST_SHOWS: Record<string, unknown> = {
   },
 };
 
-/** Reviews of this show, as GET /events/{id}/reviews would return them (newest first). */
-export function getShowReviews(event: ConcertEvent): Review[] {
+const newestFirst = (a: Review, b: Review) => Date.parse(b.created_at) - Date.parse(a.created_at);
+
+/** Every review of this show, hidden ones included (what the admin sees). */
+function allShowReviews(event: ConcertEvent): Review[] {
   const extra = event.slug === "echoes-in-bloom" ? MORE_ECHOES : [];
-  return [...getEventReviews(event.id), ...extra].toSorted((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  return [...getEventReviews(event.id), ...extra].toSorted(newestFirst);
 }
 
-export function getPastShowReviews(event: ConcertEvent): PastShowReviews | null {
+function allPastShowReviews(event: ConcertEvent): PastShowReviews | null {
   const raw = PAST_SHOWS[event.id];
   return raw ? PastShowReviewsSchema.parse(raw) : null;
+}
+
+const published = (review: Review) => review.status === "published";
+
+/** Reviews of this show, as GET /events/{id}/reviews would return them: published only, newest first. */
+export const getShowReviews = (event: ConcertEvent): Review[] => allShowReviews(event).filter(published);
+
+export function getPastShowReviews(event: ConcertEvent): PastShowReviews | null {
+  const past = allPastShowReviews(event);
+  return past ? { ...past, reviews: past.reviews.filter(published) } : null;
+}
+
+export interface ModeratedReview {
+  review: Review;
+  /** The show it was written for (a previous edition for upcoming events). */
+  show_title: string;
+  event_slug: string;
+}
+
+/** Every review across the platform for the admin moderation page, newest first. */
+export function getModerationQueue(): ModeratedReview[] {
+  return EVENTS.flatMap((event) => {
+    const own = allShowReviews(event).map((review) => ({ review, show_title: event.title, event_slug: event.slug }));
+    const past = allPastShowReviews(event);
+    const previous = past ? past.reviews.map((review) => ({ review, show_title: past.show_title, event_slug: event.slug })) : [];
+    return [...own, ...previous];
+  }).toSorted((a, b) => newestFirst(a.review, b.review));
 }
 
 /** Only attendees review (PRD §F): the demo user's checked-in ticket is the proof. */

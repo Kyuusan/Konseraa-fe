@@ -14,6 +14,7 @@ import {
   TicketPercent,
   CircleHelp,
   LogOut,
+  MessageSquareText,
   RotateCcw,
   type LucideIcon,
 } from "lucide-react";
@@ -67,6 +68,7 @@ export const ADMIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { label: "Verifications", href: "/admin/verifications", icon: ShieldCheck },
   { label: "Events", href: "/admin/events", icon: CalendarDays },
+  { label: "Reviews", href: "/admin/reviews", icon: MessageSquareText },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Transactions", href: "/admin/transactions", icon: Receipt },
 ];
