@@ -60,7 +60,7 @@ export function GatekeeperManager({ organizerId, gatekeepers: initial, assignabl
       {gatekeepers.length === 0 ? (
         <EmptyState title="No gatekeepers yet" description="Add the people who will scan tickets at your venue gates." />
       ) : (
-        <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+        <div className="overflow-hidden rounded-[20px] bg-bg-surface">
           <Table className="min-w-200">
             <TableHeader>
               <TableRow>

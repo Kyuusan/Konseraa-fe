@@ -8,7 +8,7 @@ const day = (iso: string) => formatDateTime(iso, TIME_ZONE, { day: "numeric", mo
 
 export function PayoutTable({ payouts }: { payouts: Payout[] }) {
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-200">
         <TableHeader>
           <TableRow>

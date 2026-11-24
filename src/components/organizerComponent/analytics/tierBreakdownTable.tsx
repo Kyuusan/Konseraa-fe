@@ -6,7 +6,7 @@ import type { TierSales } from "@/types/analytics";
 
 export function TierBreakdownTable({ tiers }: { tiers: TierSales[] }) {
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-160">
         <TableHeader>
           <TableRow>

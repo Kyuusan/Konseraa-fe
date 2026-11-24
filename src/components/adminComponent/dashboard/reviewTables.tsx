@@ -10,7 +10,7 @@ const submitted = (iso: string) =>
 
 export function EventReviewTable({ reviews }: { reviews: PendingEventReview[] }) {
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-200">
         <TableHeader>
           <TableRow>
@@ -55,7 +55,7 @@ export function EventReviewTable({ reviews }: { reviews: PendingEventReview[] })
 
 export function VerificationTable({ verifications }: { verifications: PendingVerification[] }) {
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-200">
         <TableHeader>
           <TableRow>

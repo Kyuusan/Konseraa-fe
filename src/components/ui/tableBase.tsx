@@ -14,7 +14,18 @@ Table.displayName = "Table";
 const TableHeader = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
->(({ className, ...props }, ref) => <thead ref={ref} className={cn(className)} {...props} />);
+>(({ className, ...props }, ref) => (
+  // A full-width band at the top of the card; the header row never stripes or lights up on hover.
+  <thead
+    ref={ref}
+    className={cn(
+      // A step lighter than the surface tones the body uses, so the header reads as its own band.
+      "border-b border-text-primary/12 bg-[color-mix(in_oklab,var(--color-bg-surface-2),var(--color-text-primary)_12%)] [&_tr]:bg-transparent [&_tr]:hover:bg-transparent",
+      className,
+    )}
+    {...props}
+  />
+));
 TableHeader.displayName = "TableHeader";
 
 const TableBody = React.forwardRef<
@@ -45,7 +56,8 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
     <tr
       ref={ref}
       className={cn(
-        "border-b border-border transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        // Quiet zebra stripes in the surface tone, a hairline between rows, a clearer hover.
+        "border-b border-text-primary/6 transition-colors even:bg-bg-surface-2/30 hover:bg-bg-surface-2/80 data-[state=selected]:bg-bg-surface-2",
         className,
       )}
       {...props}
@@ -61,7 +73,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-3 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:w-px [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5",
+      "h-11 px-4 text-left align-middle text-xs font-semibold text-text-primary [&:has([role=checkbox])]:w-px [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5",
       className,
     )}
     {...props}
@@ -76,7 +88,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-3 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5",
+      "px-4 py-3 align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-0.5",
       className,
     )}
     {...props}

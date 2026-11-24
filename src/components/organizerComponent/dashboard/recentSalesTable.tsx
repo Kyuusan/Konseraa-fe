@@ -6,7 +6,7 @@ const TIME_ZONE = "Asia/Jakarta";
 
 export function RecentSalesTable({ sales }: { sales: OrganizerSale[] }) {
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-160">
         <TableHeader>
           <TableRow>

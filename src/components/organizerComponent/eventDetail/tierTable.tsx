@@ -9,7 +9,7 @@ export function TierTable({ tiers }: { tiers: TicketTier[] }) {
   }
 
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-120">
         <TableHeader>
           <TableRow>

@@ -9,7 +9,7 @@ const cellColor = (count: number, max: number) =>
 export function ArrivalsHeatmap({ arrivals }: { arrivals: Arrivals }) {
   return (
     <div className="space-y-3">
-      <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+      <div className="overflow-hidden rounded-[20px] bg-bg-surface">
         <Table className="min-w-200">
           <TableHeader>
             <TableRow>

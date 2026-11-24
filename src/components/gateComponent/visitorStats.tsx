@@ -34,7 +34,7 @@ export function VisitorSummary({ stats }: { stats: CheckInStats }) {
 
 export function TierAttendanceTable({ stats }: { stats: CheckInStats }) {
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-120">
         <TableHeader>
           <TableRow>
@@ -65,7 +65,7 @@ export function ScanLogTable({ logs, timeZone }: { logs: CheckIn[]; timeZone: st
   }
 
   return (
-    <div className="rounded-[20px] bg-bg-surface px-2 py-1">
+    <div className="overflow-hidden rounded-[20px] bg-bg-surface">
       <Table className="min-w-160">
         <TableHeader>
           <TableRow>
