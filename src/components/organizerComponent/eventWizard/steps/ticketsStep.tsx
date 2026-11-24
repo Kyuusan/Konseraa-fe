@@ -1,42 +1,38 @@
 "use client";
 
 import { Input } from "@/components/ui/input";
-import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
+import { SectionMap } from "@/components/userComponent/shared/sectionMap";
 import { MAX_TICKETS_PER_TRANSACTION, TIER_TYPE_LABELS } from "@/lib/constants";
 import { formatNumber } from "@/lib/format";
 import { TICKET_TIER_TYPES } from "@/types/event";
-import type { EventTierForm } from "@/types/eventForm";
-import { DocumentField } from "../../onboarding/documentField";
+import type { EventSectionForm, EventTierForm } from "@/types/eventForm";
 import { FormField } from "../../onboarding/formField";
 import { FormSection } from "../../onboarding/formSection";
 import { OptionSelect } from "../../shared/optionSelect";
 import { AddRowButton, RowCard } from "../rowList";
-import { emptyTier, type SeatMapUpload } from "../wizardValues";
+import { emptyTier, layoutFromSections, mapTiersFromForm } from "../wizardValues";
 
 const TIER_OPTIONS = TICKET_TIER_TYPES.map((type) => ({ value: type, label: TIER_TYPE_LABELS[type] }));
+const NO_AREA = "none";
 
 interface TicketsStepProps {
   value: EventTierForm[];
   errors: Record<string, string>;
   capacity: number;
+  /** Areas from the venue step; each tier can point to one (ticket_tiers.venue_section_id). */
+  sections: EventSectionForm[];
   onChange: (value: EventTierForm[]) => void;
-  eventTitle: string;
-  seatMap: SeatMapUpload | null;
-  onSeatMapChange: (value: SeatMapUpload | null) => void;
 }
 
-export function TicketsStep({ value, errors, capacity, onChange, eventTitle, seatMap, onSeatMapChange }: TicketsStepProps) {
+export function TicketsStep({ value, errors, capacity, sections, onChange }: TicketsStepProps) {
   const update = (index: number, patch: Partial<EventTierForm>) =>
     onChange(value.map((tier, i) => (i === index ? { ...tier, ...patch } : tier)));
   const totalQuota = value.reduce((sum, tier) => sum + (Number(tier.quota) || 0), 0);
-
-  function handleSeatMap(file: File | null) {
-    // Previews are local object URLs; free the old one when it is replaced.
-    if (seatMap?.previewUrl.startsWith("blob:")) URL.revokeObjectURL(seatMap.previewUrl);
-    onSeatMapChange(
-      file ? { file: { name: file.name, size: file.size, mime_type: file.type }, previewUrl: URL.createObjectURL(file) } : null,
-    );
-  }
+  const layout = layoutFromSections(sections);
+  const areaOptions = [
+    { value: NO_AREA, label: "No specific area" },
+    ...layout.sections.map((section) => ({ value: section.id, label: section.name })),
+  ];
 
   return (
     <div className="space-y-6">
@@ -52,6 +48,8 @@ export function TicketsStep({ value, errors, capacity, onChange, eventTitle, sea
             onChange: (event: { target: { value: string } }) => update(index, { [field]: event.target.value }),
             className: "h-11",
           });
+          // An area removed in the venue step no longer counts.
+          const area = layout.sections.some((section) => section.id === tier.section_key) ? tier.section_key : NO_AREA;
           return (
             <RowCard
               key={tier.key}
@@ -93,6 +91,16 @@ export function TicketsStep({ value, errors, capacity, onChange, eventTitle, sea
                   <Input {...number("max_per_transaction")} inputMode="numeric" min={1} max={MAX_TICKETS_PER_TRANSACTION} />
                 </FormField>
               </div>
+              {layout.sections.length > 0 && (
+                <FormField id={id("area")} label="Area" hint="Where this ticket gets you in, as shown on the seat map.">
+                  <OptionSelect
+                    id={id("area")}
+                    value={area}
+                    options={areaOptions}
+                    onChange={(key) => update(index, { section_key: key === NO_AREA ? "" : key })}
+                  />
+                </FormField>
+              )}
             </RowCard>
           );
         })}
@@ -104,29 +112,11 @@ export function TicketsStep({ value, errors, capacity, onChange, eventTitle, sea
         </p>
       </FormSection>
 
-      <FormSection
-        id="seat-map"
-        title="Seat map (optional)"
-        description="A layout of the venue with each tier's area. Buyers can open it full size on the event and ticket pages."
-      >
-        <DocumentField
-          id="seat_map"
-          label="Seat map image"
-          hint="Use the tier names from above. JPG, PNG or WebP up to 5 MB."
-          accept="image"
-          value={seatMap?.file ?? null}
-          onChange={() => {}}
-          onFileSelect={handleSeatMap}
-        />
-        {seatMap && (
-          <SeatMapPreview
-            src={seatMap.previewUrl}
-            eventTitle={eventTitle || "Your event"}
-            description="This is how buyers will see it."
-            className="bg-bg-surface-2"
-          />
-        )}
-      </FormSection>
+      {layout.sections.length > 0 && (
+        <FormSection id="tickets-map" title="Seat map" description="How buyers will see your areas and tiers. Add or change areas in the Venue step.">
+          <SectionMap layout={layout} tiers={mapTiersFromForm(value)} />
+        </FormSection>
+      )}
     </div>
   );
 }

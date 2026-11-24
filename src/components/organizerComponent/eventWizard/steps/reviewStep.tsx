@@ -3,10 +3,10 @@
 import { Pencil } from "lucide-react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/animate-ui/components/buttons/button";
-import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
+import { SectionMap } from "@/components/userComponent/shared/sectionMap";
 import { TIER_TYPE_LABELS } from "@/lib/constants";
 import { formatNumber, formatPrice } from "@/lib/format";
-import { TIMEZONES, VENUE_TYPE_LABELS, type EventWizardValues } from "../wizardValues";
+import { layoutFromSections, mapTiersFromForm, TIMEZONES, VENUE_TYPE_LABELS, type EventWizardValues } from "../wizardValues";
 
 const sessionDate = new Intl.DateTimeFormat("en-US", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
 
@@ -16,7 +16,9 @@ interface ReviewStepProps {
 }
 
 export function ReviewStep({ values, onEdit }: ReviewStepProps) {
-  const { basics, venue, sessions, tiers, seatMap } = values;
+  const { basics, venue, sections, sessions, tiers } = values;
+  const layout = layoutFromSections(sections);
+  const areaName = (key: string) => layout.sections.find((section) => section.id === key)?.name;
   const timezone = TIMEZONES.find((zone) => zone.value === venue.timezone)?.label ?? venue.timezone;
 
   return (
@@ -59,14 +61,15 @@ export function ReviewStep({ values, onEdit }: ReviewStepProps) {
             {formatPrice(Number(tier.price))} · {TIER_TYPE_LABELS[tier.tier_type]}
             <span className="block text-text-primary/70">
               {formatNumber(Number(tier.quota))} per session, up to {tier.max_per_transaction} per order
+              {areaName(tier.section_key) && ` · ${areaName(tier.section_key)}`}
             </span>
           </Row>
         ))}
         <Row label="Seat map">
-          {seatMap ? (
-            <SeatMapPreview src={seatMap.previewUrl} eventTitle={basics.title} description={seatMap.file.name} className="bg-bg-surface-2" />
+          {layout.sections.length > 0 ? (
+            <SectionMap layout={layout} tiers={mapTiersFromForm(tiers)} />
           ) : (
-            "None. Buyers will only see the tier list."
+            "No areas. Buyers will only see the tier list."
           )}
         </Row>
       </ReviewSection>

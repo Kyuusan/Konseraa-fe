@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { getOrganizerEventDetail } from "@/__fixtures__/organizerEvents";
+import { getVenueLayout } from "@/__fixtures__/venueLayouts";
 import { EventContentForm } from "@/components/organizerComponent/eventDetail/eventContentForm";
 import { EventFacts } from "@/components/organizerComponent/eventDetail/eventFacts";
 import { EventStats } from "@/components/organizerComponent/eventDetail/eventStats";
@@ -10,7 +11,7 @@ import { requireApprovedOrganizer } from "@/components/organizerComponent/requir
 import { SectionHeader } from "@/components/userComponent/home/sectionHeader";
 import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
-import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
+import { VenueSeatMap } from "@/components/userComponent/shared/venueSeatMap";
 import { StatusBadge } from "@/components/userComponent/shared/statusBadge";
 import { formatDate } from "@/lib/format";
 
@@ -71,13 +72,12 @@ export default async function Page({ params }: PageProps) {
             <SectionHeader id="tiers-heading" title="Ticket tiers" description="Quota is per session." />
             <TierTable tiers={tiers} />
           </section>
-          {event.seat_map_url && (
-            <SeatMapPreview
-              src={event.seat_map_url}
-              eventTitle={event.title}
-              description="What buyers see on the event and ticket pages."
-            />
-          )}
+          <VenueSeatMap
+            layout={getVenueLayout(event.venue.id)}
+            tiers={tiers}
+            eventTitle={event.title}
+            description="Built from the venue's sections. Buyers see it on the event and ticket pages."
+          />
         </div>
 
         <div className="space-y-6">

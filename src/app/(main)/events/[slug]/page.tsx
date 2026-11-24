@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { getEventBySlug, getEventSessions } from "@/__fixtures__/events";
+import { getEventBySlug, getEventSessions, getEventTicketTiers } from "@/__fixtures__/events";
+import { getVenueLayout } from "@/__fixtures__/venueLayouts";
 import { canReviewEvent, getPastShowReviews, getShowReviews } from "@/__fixtures__/reviews";
 import { getCurrentSession } from "@/__fixtures__/session";
 import { BookingPanel } from "@/components/userComponent/eventDetail/bookingPanel";
@@ -7,7 +8,7 @@ import { EventHero } from "@/components/userComponent/eventDetail/eventHero";
 import { EventTabs } from "@/components/userComponent/eventDetail/eventTabs";
 import { LineupList } from "@/components/userComponent/eventDetail/lineupList";
 import { ReviewList } from "@/components/userComponent/eventDetail/reviewList";
-import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
+import { VenueSeatMap } from "@/components/userComponent/shared/venueSeatMap";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -49,7 +50,7 @@ export default async function Page({ params, searchParams }: PageProps) {
       <aside aria-label="Book tickets" className="lg:pt-0">
         <div className="space-y-4 lg:sticky lg:top-28">
           <BookingPanel event={event} sessions={sessions} />
-          {event.seat_map_url && <SeatMapPreview src={event.seat_map_url} eventTitle={event.title} />}
+          <VenueSeatMap layout={getVenueLayout(event.venue.id)} tiers={getEventTicketTiers(event.id)} eventTitle={event.title} />
         </div>
       </aside>
     </div>

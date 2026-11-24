@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import { getEventBySlug, getEventSessions, getEventTicketTiers } from "@/__fixtures__/events";
+import { getVenueLayout } from "@/__fixtures__/venueLayouts";
 import { param } from "@/components/userComponent/checkout/checkoutParams";
 import { EmptyState } from "@/components/userComponent/shared/emptyState";
 import { PageHeader } from "@/components/userComponent/shared/pageHeader";
-import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
+import { VenueSeatMap } from "@/components/userComponent/shared/venueSeatMap";
 import { TierSelector } from "@/components/userComponent/ticketSelection/tierSelector";
 import { formatDate, formatTime } from "@/lib/format";
 import { ButtonLink } from "@/components/userComponent/shared/buttonLink";
@@ -22,6 +23,8 @@ export default async function Page({ params, searchParams }: PageProps) {
   const requested = param(await searchParams, "session");
   const session = sessions.find((item) => item.id === requested) ?? sessions[0];
   const timeZone = event.venue.timezone;
+  const tiers = getEventTicketTiers(event.id);
+  const layout = getVenueLayout(event.venue.id);
 
   const backLink = (
     <ButtonLink href={`/events/${event.slug}`} variant="outline" hoverScale={1} className="rounded-full">Back to event</ButtonLink>
@@ -43,16 +46,17 @@ export default async function Page({ params, searchParams }: PageProps) {
         <TierSelector
           eventSlug={event.slug}
           sessionId={session.id}
-          tiers={getEventTicketTiers(event.id)}
+          tiers={tiers}
           seatMap={
-            event.seat_map_url && (
-              <SeatMapPreview
+            layout.sections.length > 0 ? (
+              <VenueSeatMap
                 variant="inline"
-                src={event.seat_map_url}
+                layout={layout}
+                tiers={tiers}
                 eventTitle={event.title}
-                description="Match each tier below to its area. Not to scale."
+                description="Match each tier to its area. Not to scale."
               />
-            )
+            ) : undefined
           }
         />
       ) : (

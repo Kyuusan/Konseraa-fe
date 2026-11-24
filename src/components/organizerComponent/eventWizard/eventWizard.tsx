@@ -8,6 +8,7 @@ import { StepIndicator, type ProfilingStep } from "@/components/userComponent/st
 import { StepNavigation } from "@/components/userComponent/stepperProfiling/stepNavigation/StepNavigation";
 import {
   EventBasicsFormSchema,
+  EventSectionsFormSchema,
   EventSessionsFormSchema,
   EventTiersFormSchema,
   EventVenueFormSchema,
@@ -54,6 +55,17 @@ export function EventWizard({ initial, categories }: EventWizardProps) {
 
   // Validates only the step on screen; the review step has nothing new to check.
   function validateStep() {
+    // The venue step also holds the areas (venue_sections); their errors are keyed "sections.<i>.<field>".
+    if (step.id === "venue") {
+      const venue = EventVenueFormSchema.safeParse(values.venue);
+      const sections = EventSectionsFormSchema.safeParse(values.sections);
+      const next = {
+        ...(venue.success ? {} : toErrors(venue.error)),
+        ...(sections.success ? {} : Object.fromEntries(Object.entries(toErrors(sections.error)).map(([key, message]) => [`sections.${key}`, message]))),
+      };
+      if (Object.keys(next).length > 0) setErrors(next);
+      return Object.keys(next).length === 0;
+    }
     const result =
       step.id === "basics"
         ? EventBasicsFormSchema.safeParse(values.basics)
@@ -104,7 +116,15 @@ export function EventWizard({ initial, categories }: EventWizardProps) {
           {step.id === "basics" && (
             <BasicsStep value={values.basics} errors={errors} categories={categories} onChange={set("basics")} />
           )}
-          {step.id === "venue" && <VenueStep value={values.venue} errors={errors} onChange={set("venue")} />}
+          {step.id === "venue" && (
+            <VenueStep
+              value={values.venue}
+              sections={values.sections}
+              errors={errors}
+              onChange={set("venue")}
+              onSectionsChange={set("sections")}
+            />
+          )}
           {step.id === "sessions" && (
             <SessionsStep value={values.sessions} errors={errors} timezoneLabel={timezoneLabel} onChange={set("sessions")} />
           )}
@@ -114,9 +134,7 @@ export function EventWizard({ initial, categories }: EventWizardProps) {
               errors={errors}
               capacity={Number(values.venue.capacity) || 0}
               onChange={set("tiers")}
-              eventTitle={values.basics.title}
-              seatMap={values.seatMap}
-              onSeatMapChange={set("seatMap")}
+              sections={values.sections}
             />
           )}
           {step.id === "review" && <ReviewStep values={values} onEdit={goTo} />}

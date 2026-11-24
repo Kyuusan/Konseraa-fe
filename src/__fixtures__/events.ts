@@ -44,13 +44,13 @@ const RAW_EVENTS = [
     id: fixtureId(1), slug: "neon-arcadia-world-tour", title: "Neon Arcadia World Tour",
     description: "The Midnight Static bring their synth-heavy live show to Jakarta for one night, with a reworked setlist built around the new record.",
     status: "published", min_price: 65, max_price: 120, venue: VENUES.istora, categories: ["Pop", "Electronic"],
-    starts_at: "2026-12-12T20:00:00+07:00", ...art(PHOTOS.lights), seat_map_url: "/seat-maps/neon-arcadia-world-tour.svg",
+    starts_at: "2026-12-12T20:00:00+07:00", ...art(PHOTOS.lights),
   },
   {
     id: fixtureId(2), slug: "gelora-fest-2026", title: "Gelora Fest 2026",
     description: "Two days of local indie and rock across one open-air stage. Each day has its own line-up and its own tickets.",
     status: "published", min_price: 30, max_price: 100, venue: VENUES.saparua, categories: ["Indie", "Rock"],
-    starts_at: "2026-12-19T15:00:00+07:00", ...art(PHOTOS.festival), seat_map_url: "/seat-maps/gelora-fest-2026.svg",
+    starts_at: "2026-12-19T15:00:00+07:00", ...art(PHOTOS.festival),
   },
   {
     id: fixtureId(3), slug: "low-tide-sessions", title: "Low Tide Sessions",
@@ -135,19 +135,39 @@ const RAW_SESSIONS: Record<string, unknown[]> = {
   ],
 };
 
-const tier = (n: number, name: string, tier_type: string, price: number, available_quota: number, max_per_transaction = 6) => ({
+// `area` is the venue section (venueLayouts.ts) the tier admits to; seated when that section is.
+const tier = (
+  n: number, name: string, tier_type: string, price: number, available_quota: number, max_per_transaction = 6,
+  area?: { section: number; seated?: boolean },
+) => ({
   id: fixtureId(400 + n), name, tier_type, price, available_quota, max_per_transaction,
+  venue_section_id: area ? fixtureId(3000 + area.section) : null,
+  is_seated: area?.seated ?? false,
 });
 
 const RAW_TIERS: Record<string, unknown[]> = {
-  [fixtureId(1)]: [tier(1, "Early Bird", "early_bird", 45, 0), tier(2, "Festival", "regular", 65, 420), tier(3, "VIP Standing", "vip", 120, 60, 4)],
-  [fixtureId(2)]: [tier(4, "Regular", "regular", 30, 1500), tier(5, "VIP Deck", "vip", 70, 120, 4), tier(6, "Group of 4", "group_package", 100, 40, 1)],
-  [fixtureId(3)]: [tier(7, "Seated", "regular", 25, 18), tier(8, "Front Table", "vip", 55, 4, 2)],
+  [fixtureId(1)]: [
+    tier(1, "Early Bird", "early_bird", 45, 0, 6, { section: 2 }),
+    tier(2, "Festival", "regular", 65, 420, 6, { section: 2 }),
+    tier(3, "VIP Standing", "vip", 120, 60, 4, { section: 1 }),
+  ],
+  [fixtureId(2)]: [
+    tier(4, "Regular", "regular", 30, 1500, 6, { section: 12 }),
+    tier(5, "VIP Deck", "vip", 70, 120, 4, { section: 11 }),
+    tier(6, "Group of 4", "group_package", 100, 40, 1, { section: 12 }),
+  ],
+  [fixtureId(3)]: [
+    tier(7, "Seated", "regular", 25, 18, 6, { section: 22, seated: true }),
+    tier(8, "Front Table", "vip", 55, 4, 2, { section: 21, seated: true }),
+  ],
   [fixtureId(4)]: [tier(9, "Category 3", "regular", 85, 900), tier(10, "Category 1", "vip", 150, 240, 4), tier(11, "Front Row", "vvip", 260, 30, 2)],
   [fixtureId(5)]: [tier(12, "Standard", "regular", 110, 2000), tier(13, "Floor", "vip", 180, 300, 4), tier(14, "Soundcheck Pass", "vvip", 320, 12, 2)],
-  [fixtureId(6)]: [tier(15, "Balcony", "regular", 70, 600), tier(16, "Stalls", "vip", 140, 150, 4)],
+  [fixtureId(6)]: [
+    tier(15, "Balcony", "regular", 70, 600, 6, { section: 32, seated: true }),
+    tier(16, "Stalls", "vip", 140, 150, 4, { section: 31, seated: true }),
+  ],
   [fixtureId(7)]: [tier(17, "Early Bird", "early_bird", 40, 35), tier(18, "General", "regular", 60, 3000), tier(19, "Cliff Deck", "vip", 140, 200, 4)],
-  [fixtureId(8)]: [tier(20, "Regular", "regular", 35, 0), tier(21, "VIP", "vip", 90, 0, 4)],
+  [fixtureId(8)]: [tier(20, "Regular", "regular", 35, 0, 6, { section: 2 }), tier(21, "VIP", "vip", 90, 0, 4, { section: 1 })],
 };
 
 const RAW_REVIEWS: Record<string, unknown[]> = {

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "@/components/animate-ui/components/buttons/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/tableBase";
-import { SeatMapPreview } from "@/components/userComponent/shared/seatMapPreview";
+import { VenueSeatMap } from "@/components/userComponent/shared/venueSeatMap";
 import { StatusBadge } from "@/components/userComponent/shared/statusBadge";
 import { TIER_TYPE_LABELS } from "@/lib/constants";
 import { formatDate, formatDateTime, formatNumber, formatPrice, formatTime } from "@/lib/format";
@@ -159,10 +159,16 @@ export function EventReviews({ items, initialOpenId }: { items: AdminEventReview
 
             <ReviewSection title="Permit and seat map">
               <DocumentChip label="Crowd permit" file={review.permit} />
-              {review.seat_map_url ? (
-                <SeatMapPreview src={review.seat_map_url} eventTitle={review.title} description="Check that the areas match the tiers." className="bg-bg-surface-2" />
+              {review.layout.sections.length > 0 ? (
+                <VenueSeatMap
+                  layout={review.layout}
+                  tiers={review.tiers}
+                  eventTitle={review.title}
+                  description="Check that every tier points to the right area."
+                  className="bg-bg-surface-2"
+                />
               ) : (
-                <p className="text-sm text-text-primary/70">No seat map. Buyers will only see the tier list.</p>
+                <p className="text-sm text-text-primary/70">This venue has no sections yet. Buyers will only see the tier list.</p>
               )}
             </ReviewSection>
 

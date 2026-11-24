@@ -3,20 +3,23 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { VENUE_TYPES } from "@/types/event";
-import type { EventVenueForm } from "@/types/eventForm";
+import type { EventSectionForm, EventVenueForm } from "@/types/eventForm";
 import { DocumentField } from "../../onboarding/documentField";
 import { FormField } from "../../onboarding/formField";
 import { FormSection } from "../../onboarding/formSection";
 import { OptionSelect } from "../../shared/optionSelect";
 import { TIMEZONES, VENUE_TYPE_LABELS } from "../wizardValues";
+import { AreasEditor } from "./areasEditor";
 
 interface VenueStepProps {
   value: EventVenueForm;
+  sections: EventSectionForm[];
   errors: Record<string, string>;
   onChange: (value: EventVenueForm) => void;
+  onSectionsChange: (value: EventSectionForm[]) => void;
 }
 
-export function VenueStep({ value, errors, onChange }: VenueStepProps) {
+export function VenueStep({ value, sections, errors, onChange, onSectionsChange }: VenueStepProps) {
   const set = <K extends keyof EventVenueForm>(key: K, next: EventVenueForm[K]) => onChange({ ...value, [key]: next });
   const text = (key: "name" | "city" | "capacity") => ({
     id: `venue-${key}`,
@@ -65,6 +68,14 @@ export function VenueStep({ value, errors, onChange }: VenueStepProps) {
         >
           <Input {...text("capacity")} type="number" inputMode="numeric" min={1} className="h-11 sm:max-w-56" />
         </FormField>
+      </FormSection>
+
+      <FormSection
+        id="venue-areas"
+        title="Areas and seat map"
+        description="Split the venue into areas, standing or with numbered seats. Each ticket tier points to one, and buyers see them as the seat map. Optional."
+      >
+        <AreasEditor value={sections} errors={errors} venueCapacity={Number(value.capacity) || 0} onChange={onSectionsChange} />
       </FormSection>
 
       <FormSection

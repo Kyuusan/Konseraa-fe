@@ -39,6 +39,39 @@ export const EventSessionFormSchema = z
   })
   .refine((session) => session.end > session.start, { path: ["end"], message: "End after the start time." });
 
+/** Limits for a generated seat grid (assumed; the backend models set none). */
+export const MAX_SECTION_ROWS = 26;
+export const MAX_SEATS_PER_ROW = 60;
+
+const wholeIn = (value: string, min: number, max: number) => /^\d+$/.test(value) && Number(value) >= min && Number(value) <= max;
+
+/**
+ * One venue_sections row. Standing areas give a capacity; seated areas give rows ×
+ * seats per row, which become seats (row_label, seat_number, coords) on save.
+ */
+export const EventSectionFormSchema = z
+  .object({
+    name: z.string().trim().min(1, "Name the area."),
+    is_seated: z.boolean(),
+    capacity: z.string(),
+    rows: z.string(),
+    seats_per_row: z.string(),
+  })
+  .superRefine((section, ctx) => {
+    if (!section.is_seated && !wholeIn(section.capacity, 1, 1_000_000)) {
+      ctx.addIssue({ code: "custom", path: ["capacity"], message: "Enter how many people fit." });
+    }
+    if (section.is_seated && !wholeIn(section.rows, 1, MAX_SECTION_ROWS)) {
+      ctx.addIssue({ code: "custom", path: ["rows"], message: `1 to ${MAX_SECTION_ROWS} rows.` });
+    }
+    if (section.is_seated && !wholeIn(section.seats_per_row, 1, MAX_SEATS_PER_ROW)) {
+      ctx.addIssue({ code: "custom", path: ["seats_per_row"], message: `1 to ${MAX_SEATS_PER_ROW} seats.` });
+    }
+  });
+
+/** Areas are optional: without them buyers only see the tier list. */
+export const EventSectionsFormSchema = z.array(EventSectionFormSchema);
+
 export const EventTierFormSchema = z.object({
   name: z.string().trim().min(1, "Name the tier."),
   tier_type: z.enum(TICKET_TIER_TYPES),
@@ -50,6 +83,8 @@ export const EventTierFormSchema = z.object({
     .int()
     .min(1, "At least 1.")
     .max(MAX_TICKETS_PER_TRANSACTION, `At most ${MAX_TICKETS_PER_TRANSACTION} per transaction.`),
+  /** Key of the area (venue section) this tier admits to; "" for none. */
+  section_key: z.string(),
 });
 
 export const EventSessionsFormSchema = z.array(EventSessionFormSchema).min(1, "Add at least one session.");
@@ -60,3 +95,4 @@ export type EventBasicsForm = z.input<typeof EventBasicsFormSchema>;
 export type EventVenueForm = z.input<typeof EventVenueFormSchema>;
 export type EventSessionForm = z.input<typeof EventSessionFormSchema> & { key: string };
 export type EventTierForm = z.input<typeof EventTierFormSchema> & { key: string };
+export type EventSectionForm = z.input<typeof EventSectionFormSchema> & { key: string };

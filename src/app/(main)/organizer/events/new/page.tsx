@@ -1,5 +1,6 @@
 import { EVENTS } from "@/__fixtures__/events";
 import { getOrganizerEventDetail } from "@/__fixtures__/organizerEvents";
+import { getVenueLayout } from "@/__fixtures__/venueLayouts";
 import { EventWizard } from "@/components/organizerComponent/eventWizard/eventWizard";
 import { emptyValues, valuesFromDraft } from "@/components/organizerComponent/eventWizard/wizardValues";
 import { requireApprovedOrganizer } from "@/components/organizerComponent/requireApprovedOrganizer";
@@ -36,7 +37,7 @@ export default async function Page({ searchParams }: PageProps) {
           <p className="mt-2">{draft.rejection_reason}</p>
         </div>
       )}
-      <EventWizard key={draft?.slug ?? "new"} initial={draft && detail ? valuesFromDraft(draft, detail.sessions, detail.tiers) : emptyValues()} categories={categories} />
+      <EventWizard key={draft?.slug ?? "new"} initial={draft && detail ? valuesFromDraft(draft, detail.sessions, detail.tiers, getVenueLayout(draft.venue.id)) : emptyValues()} categories={categories} />
     </div>
   );
 }

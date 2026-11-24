@@ -46,8 +46,6 @@ export const ConcertEventSchema = z.object({
   banner_url: z.url(),
   /** Not in spec: first session start, for cards and the date filter. */
   starts_at: IsoDateTime,
-  /** Not in spec: seat map / venue layout image uploaded by the organizer (optional). */
-  seat_map_url: z.string().nullable().default(null),
 });
 export type ConcertEvent = z.infer<typeof ConcertEventSchema>;
 
@@ -60,8 +58,43 @@ export const TicketTierSchema = z.object({
   price: z.number().nonnegative(),
   max_per_transaction: z.int().positive(),
   available_quota: z.int().nonnegative(),
+  /** ticket_tiers.venue_section_id (backend models): the area this tier admits to. */
+  venue_section_id: z.uuid().nullable().default(null),
+  /** ticket_tiers.is_seated (backend models). */
+  is_seated: z.boolean().default(false),
 });
 export type TicketTier = z.infer<typeof TicketTierSchema>;
+
+// The seat map is built from the venue layout in the backend models (venue_sections
+// + seats), not from an uploaded image: there is no column for one.
+
+/** venue_sections: one area of a venue, standing or seated. */
+export const VenueSectionSchema = z.object({
+  id: z.uuid(),
+  venue_id: z.uuid(),
+  name: z.string(),
+  capacity: z.int().positive(),
+  is_seated: z.boolean(),
+});
+export type VenueSection = z.infer<typeof VenueSectionSchema>;
+
+/** seats: one seat of a seated section; coords place it inside its section. */
+export const SeatSchema = z.object({
+  id: z.uuid(),
+  venue_section_id: z.uuid(),
+  row_label: z.string(),
+  seat_number: z.string(),
+  coord_x: z.number().nullable(),
+  coord_y: z.number().nullable(),
+});
+export type Seat = z.infer<typeof SeatSchema>;
+
+/** A venue's sections and seats, front of house first. */
+export const VenueLayoutSchema = z.object({
+  sections: z.array(VenueSectionSchema),
+  seats: z.array(SeatSchema),
+});
+export type VenueLayout = z.infer<typeof VenueLayoutSchema>;
 
 /** Not in spec (GET /events/{id}/sessions has no schema): mirrors artists + event_artists. */
 export const ArtistSchema = z.object({
@@ -87,9 +120,14 @@ export const ReviewSchema = z.object({
   user_full_name: z.string(),
   rating: z.int().min(1).max(5),
   comment: z.string(),
+  /** reviews.photo_urls in the backend models (not in the OpenAPI spec). */
+  photo_urls: z.array(z.string()).default([]),
   created_at: IsoDateTime,
 });
 export type Review = z.infer<typeof ReviewSchema>;
+
+/** Assumed limits for review photos (not in the PRD): up to 3 images of 5 MB. */
+export const MAX_REVIEW_PHOTOS = 3;
 
 /** Not in spec (no review endpoint yet): what an attendee submits. */
 export const ReviewFormSchema = z.object({
@@ -99,6 +137,7 @@ export const ReviewFormSchema = z.object({
     .trim()
     .min(20, "Tell other fans a bit more (at least 20 characters).")
     .max(1000, "Keep it under 1000 characters."),
+  photo_urls: z.array(z.string()).max(MAX_REVIEW_PHOTOS, `Add up to ${MAX_REVIEW_PHOTOS} photos.`),
 });
 export type ReviewForm = z.infer<typeof ReviewFormSchema>;
 
