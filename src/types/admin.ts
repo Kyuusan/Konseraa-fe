@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { BOOKING_STATUSES } from "./booking";
+import { USER_ROLES, USER_STATUSES } from "./user";
 import { EventSessionSchema, TicketTierSchema, VenueLayoutSchema, VenueSchema } from "./event";
 import {
   AccountOwnerSchema,
@@ -47,6 +48,8 @@ export const AdminTransactionSchema = z.object({
   total_amount: z.number().nonnegative(),
   platform_fee_amount: z.number().nonnegative(),
   status: z.enum(BOOKING_STATUSES),
+  /** Not in spec: payment_methods.name of the booking's payment. */
+  payment_method_name: z.string().nullable().default(null),
   created_at: IsoDateTime,
 });
 export type AdminTransaction = z.infer<typeof AdminTransactionSchema>;
@@ -119,3 +122,68 @@ export const ReviewDecisionSchema = z.discriminatedUnion("approved", [
   }),
 ]);
 export type ReviewDecision = z.infer<typeof ReviewDecisionSchema>;
+
+/** A row of GET /admin/users (users + user_profiles + roles in the backend models). */
+export const AdminUserSchema = z.object({
+  id: z.uuid(),
+  full_name: z.string(),
+  email: z.email(),
+  phone: z.string().nullable(),
+  city: z.string().nullable(),
+  status: z.enum(USER_STATUSES),
+  roles: z.array(z.enum(USER_ROLES)),
+  created_at: IsoDateTime,
+  last_login_at: IsoDateTime.nullable(),
+});
+export type AdminUser = z.infer<typeof AdminUserSchema>;
+
+/** Body of PUT /admin/users/{id}/status (in spec). */
+export const UserStatusChangeSchema = z.object({ status: z.enum(USER_STATUSES) });
+
+/** payouts in the backend models, as the admin finance page lists them. */
+export const AdminPayoutSchema = z.object({
+  id: z.uuid(),
+  organizer_name: z.string(),
+  event_title: z.string(),
+  gross_amount: z.number().nonnegative(),
+  commission_amount: z.number().nonnegative(),
+  net_amount: z.number().nonnegative(),
+  status: z.enum(["scheduled", "processing", "paid"]),
+  scheduled_at: IsoDateTime,
+  paid_at: IsoDateTime.nullable(),
+  bank_reference: z.string().nullable(),
+});
+export type AdminPayout = z.infer<typeof AdminPayoutSchema>;
+
+/** A finished event with no payout yet: what POST /admin/payouts { organizer_id, event_id } schedules. */
+export const PayoutCandidateSchema = z.object({
+  organizer_id: z.uuid(),
+  event_id: z.uuid(),
+  organizer_name: z.string(),
+  event_title: z.string(),
+  event_ended_at: IsoDateTime,
+  gross_amount: z.number().nonnegative(),
+  /** From commission_settings (event → organizer → global), worked out by the backend. */
+  commission_rate_percent: z.number().nonnegative(),
+  commission_amount: z.number().nonnegative(),
+  net_amount: z.number().nonnegative(),
+});
+export type PayoutCandidate = z.infer<typeof PayoutCandidateSchema>;
+
+/** What GET /admin/financials would return for the finance page. */
+export const FinanceSummarySchema = z.object({
+  month_gross: z.number().nonnegative(),
+  month_commission: z.number().nonnegative(),
+  all_time_commission: z.number().nonnegative(),
+  month_refunds: z.number().nonnegative(),
+  scheduled_payouts_total: z.number().nonnegative(),
+});
+export type FinanceSummary = z.infer<typeof FinanceSummarySchema>;
+
+/**
+ * An admin refund that skips the 7-day rule for force majeure (PRD §9.1). Becomes a
+ * refunds row (backend models) with the reason and processed_by = the admin.
+ */
+export const ForceRefundSchema = z.object({
+  reason: z.string().trim().min(15, "Say what happened in at least 15 characters."),
+});

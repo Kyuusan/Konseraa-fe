@@ -7,6 +7,7 @@ import type { OrganizerVerificationStatus } from "@/types/organizer";
 import type { PromoStatus } from "@/types/promo";
 import type { RefundRequestStatus } from "@/types/refund";
 import type { TicketStatus } from "@/types/ticket";
+import type { User } from "@/types/user";
 
 type Status =
   | BookingStatus
@@ -15,6 +16,7 @@ type Status =
   | OrganizerVerificationStatus
   | PromoStatus
   | RefundRequestStatus
+  | User["status"]
   | CheckInResult
   | Gatekeeper["status"]
   | (typeof EVENT_STATUSES)[number];
@@ -45,6 +47,7 @@ const STATUS_TONE: Record<Status, keyof typeof TONES> = {
   in_review: "attention",
   scheduled: "attention",
   requested: "attention",
+  pending_verification: "attention",
   draft: "neutral",
   completed: "neutral",
   transferred: "neutral",
@@ -55,6 +58,8 @@ const STATUS_TONE: Record<Status, keyof typeof TONES> = {
   inactive: "neutral",
   expired: "warning",
   duplicate: "warning",
+  suspended: "warning",
+  banned: "danger",
   invalid: "danger",
   failed: "danger",
   cancelled: "danger",
