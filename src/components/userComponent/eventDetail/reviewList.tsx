@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import type { PastShowReviews, Review, ReviewForm as ReviewFormValues } from "@/types/event";
 import { EmptyState } from "../shared/emptyState";
 import { ReviewForm } from "./reviewForm";
+import { ReviewPhotos } from "./reviewPhotos";
 
 function Rating({ value }: { value: number }) {
   return (
@@ -66,6 +67,7 @@ function ReviewItems({ reviews, timeZone, ownId }: { reviews: Review[]; timeZone
           </div>
           {/* Plain text only: user content is never rendered as HTML (no dangerouslySetInnerHTML, per rules). */}
           <p className="text-sm leading-relaxed whitespace-pre-line">{review.comment}</p>
+          <ReviewPhotos photos={review.photo_urls} author={review.user_full_name} />
           <p className="text-xs text-text-primary/60">{formatDate(review.created_at, timeZone)}</p>
         </li>
       ))}

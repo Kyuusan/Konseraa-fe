@@ -2,22 +2,27 @@
 // has ended (PRD §F); upcoming events show the reviews of their previous edition.
 import { PastShowReviewsSchema, ReviewSchema, type ConcertEvent, type PastShowReviews, type Review } from "@/types/event";
 import { getEventReviews } from "./events";
-import { fixtureId } from "./ids";
+import { fixtureId, unsplash } from "./ids";
 import { TICKETS } from "./tickets";
 
 let next = 2600;
-const review = (user_full_name: string, rating: number, comment: string, created_at: string) => ({
+const review = (user_full_name: string, rating: number, comment: string, created_at: string, photos: string[] = []) => ({
   id: fixtureId(next++),
   user_full_name,
   rating,
   comment,
+  photo_urls: photos.map((photo) => unsplash(photo, 1200, 1200)),
   created_at,
 });
 
+const CROWD = "photo-1459749411175-04bf5292ceea";
+const LIGHTS = "photo-1470225620780-dba8ba36b745";
+const STAGE = "photo-1501386761578-eac5c94b800a";
+
 /** More reviews for Echoes in Bloom, on top of the three in events.ts. */
 const MORE_ECHOES = ReviewSchema.array().parse([
-  review("Kevin H.", 4, "The new songs sound even bigger live. Merch line was long, so go early.", "2026-10-20T11:30:00+07:00"),
-  review("Ayu P.", 5, "Perfect setlist and the lights during the last song were unreal.", "2026-10-21T08:15:00+07:00"),
+  review("Kevin H.", 4, "The new songs sound even bigger live. Merch line was long, so go early.", "2026-10-20T11:30:00+07:00", [CROWD]),
+  review("Ayu P.", 5, "Perfect setlist and the lights during the last song were unreal.", "2026-10-21T08:15:00+07:00", [LIGHTS, STAGE]),
   review("Daniel K.", 3, "Good band, but the sound at the back of the hall was muddy.", "2026-10-22T19:45:00+07:00"),
 ]);
 
@@ -25,7 +30,7 @@ const PAST_SHOWS: Record<string, unknown> = {
   [fixtureId(1)]: {
     show_title: "Neon Arcadia Tour, Bandung", show_date: "2025-08-16T20:00:00+07:00",
     reviews: [
-      review("Rizky A.", 5, "Synths, lasers and a crowd that sang every word. Worth the trip from Jakarta.", "2025-08-17T10:00:00+07:00"),
+      review("Rizky A.", 5, "Synths, lasers and a crowd that sang every word. Worth the trip from Jakarta.", "2025-08-17T10:00:00+07:00", [LIGHTS, CROWD, STAGE]),
       review("Putri A.", 4, "Great energy. The VIP area got crowded near the end.", "2025-08-18T14:20:00+07:00"),
       review("Fajar N.", 5, "Tightest live band I've seen. Already bought tickets for this one.", "2025-08-19T09:05:00+07:00"),
     ],
@@ -33,7 +38,7 @@ const PAST_SHOWS: Record<string, unknown> = {
   [fixtureId(2)]: {
     show_title: "Gelora Fest 2025", show_date: "2025-12-13T15:00:00+07:00",
     reviews: [
-      review("Sinta M.", 5, "Two stages of local bands and the food court was great. Bring a raincoat.", "2025-12-15T12:00:00+07:00"),
+      review("Sinta M.", 5, "Two stages of local bands and the food court was great. Bring a raincoat.", "2025-12-15T12:00:00+07:00", [CROWD]),
       review("Bayu S.", 4, "Line-up was strong. Getting out after the last act took a while.", "2025-12-15T18:40:00+07:00"),
     ],
   },
@@ -54,7 +59,7 @@ const PAST_SHOWS: Record<string, unknown> = {
   [fixtureId(5)]: {
     show_title: "Seoul Afterglow 2025", show_date: "2025-10-11T18:00:00+09:00",
     reviews: [
-      review("Mei L.", 5, "Every group sounded live, not just playback. The fan chants were so loud.", "2025-10-12T10:20:00+09:00"),
+      review("Mei L.", 5, "Every group sounded live, not just playback. The fan chants were so loud.", "2025-10-12T10:20:00+09:00", [STAGE, LIGHTS]),
       review("Andi R.", 4, "Amazing staging. Floor tickets give the best view of the walkway.", "2025-10-13T21:00:00+09:00"),
       review("Wulan S.", 5, "Soundcheck pass was worth it, we heard two songs they didn't play later.", "2025-10-14T13:15:00+09:00"),
     ],
